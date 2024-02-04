@@ -24,7 +24,7 @@ namespace ObjViewer
         
         private Vector2 _previousMousePosition;
         private bool _isDragging;
-
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -47,23 +47,25 @@ namespace ObjViewer
             _camera.Transform.Position = new Vector3(0, 2, 8);
             _camera.Transform.LookAt(Vector3.Zero, Vector3.UnitY);
 
-            Mesh mesh = MeshGenerator.CreatePlane(5, 300);
+            //Mesh mesh = MeshGenerator.CreateCube(4);
+            Mesh mesh = MeshGenerator.CreateSphere(2, 128);
             _model = new Model
             {
                 Mesh = mesh,
                 Transform = new Transform
                 {
                     Position = Vector3.Zero,
-                    Scale = new Vector3(1, 1, 1)
+                    Scale = new Vector3(1, 2, 1)
                 }
             };
             
             _uiUpdateTimer.Start();
             _frameTimer.Start();
-            CompositionTarget.Rendering += Render;
+
+            CompositionTarget.Rendering += OnRendering;
         }
 
-        private void Render(object? sender, EventArgs eventArgs)
+        private void OnRendering(object? sender, EventArgs e)
         {
             var frameTime = _frameTimer.Elapsed.TotalSeconds;
             _frameTimer.Restart();
@@ -138,6 +140,7 @@ namespace ObjViewer
         {
             base.OnMouseWheel(e);
             var delta = e.Delta / 120.0f;
+            
             _camera.Transform.Position += _camera.Transform.Forward * -delta;
         }
 

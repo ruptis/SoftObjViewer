@@ -9,7 +9,7 @@ public class Renderer
 
     private readonly VertexShader _vertexShader = new();
     private readonly FragmentShader _fragmentShader = new();
-    private readonly BresenhamRasterizer _bresenhamRasterizer = new();
+    private readonly TriangleRasterizer _bresenhamRasterizer = new();
 
     public Renderer()
     {

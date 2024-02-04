@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 namespace ObjViewer.Rendering;
@@ -10,7 +11,7 @@ public static class MeshGenerator
     {
         List<Vertex> vertices = [];
         List<int> triangles = [];
-        
+
         Vector3[] cubeVertices =
         [
             new Vector3(-size / 2, -size / 2, -size / 2),
@@ -22,8 +23,26 @@ public static class MeshGenerator
             new Vector3(size / 2, size / 2, size / 2),
             new Vector3(-size / 2, size / 2, size / 2),
         ];
-        vertices.AddRange(cubeVertices.Select(t => new Vertex(t, Vector3.Normalize(t), new Vector2(0, 0))));
+        Vector3[] cubeNormals =
+        [
+            new Vector3(0, 0, -1),
+            new Vector3(0, 0, 1),
+            new Vector3(0, -1, 0),
+            new Vector3(0, 1, 0),
+            new Vector3(-1, 0, 0),
+            new Vector3(1, 0, 0),
+        ];
+        Vector2[] cubeUVs =
+        [
+            new Vector2(0, 0),
+            new Vector2(1, 0),
+            new Vector2(1, 1),
+            new Vector2(0, 1),
+        ];
         
+        for (var i = 0; i < 8; i++)
+            vertices.Add(new Vertex(cubeVertices[i], cubeNormals[i / 4], cubeUVs[i % 4]));
+
         int[] cubeTriangles =
         [
             0, 1, 2, 2, 3, 0,
@@ -37,12 +56,12 @@ public static class MeshGenerator
 
         return new Mesh(vertices, triangles);
     }
-    
+
     public static Mesh CreateSphere(float radius = 1f, int segments = 16)
     {
         List<Vertex> vertices = [];
         List<int> triangles = [];
-        
+
         for (var i = 0; i <= segments; i++)
         {
             var phi = MathF.PI * i / segments;
@@ -55,7 +74,7 @@ public static class MeshGenerator
                 vertices.Add(new Vertex(new Vector3(x, y, z) * radius, new Vector3(x, y, z), new Vector2(j / (float)segments, i / (float)segments)));
             }
         }
-        
+
         for (var i = 0; i < segments; i++)
         {
             for (var j = 0; j < segments; j++)
@@ -73,12 +92,12 @@ public static class MeshGenerator
 
         return new Mesh(vertices, triangles);
     }
-    
+
     public static Mesh CreatePlane(float size = 1f, int segments = 1)
     {
         List<Vertex> vertices = [];
         List<int> triangles = [];
-        
+
         for (var i = 0; i <= segments; i++)
         {
             for (var j = 0; j <= segments; j++)
@@ -88,7 +107,7 @@ public static class MeshGenerator
                 vertices.Add(new Vertex(new Vector3(x, 0, z), Vector3.UnitY, new Vector2(j / (float)segments, i / (float)segments)));
             }
         }
-        
+
         for (var i = 0; i < segments; i++)
         {
             for (var j = 0; j < segments; j++)
