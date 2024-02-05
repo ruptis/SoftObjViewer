@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Drawing;
 using System.Numerics;
 using GraphicsPipeline;
-namespace ObjViewer.Rendering;
+namespace ObjViewer.Rendering.Rasterization;
 
 public sealed class BresenhamRasterizer : IRasterizer<Vertex>
 {
-    private int _width;
     private int _height;
 
     private Matrix4x4 _screenSpaceTransform;
+    private int _width;
 
     public void SetViewport(int width, int height)
     {
@@ -29,7 +28,7 @@ public sealed class BresenhamRasterizer : IRasterizer<Vertex>
         var yB = (int)screenSpaceB.Y;
         var xC = (int)screenSpaceC.X;
         var yC = (int)screenSpaceC.Y;
-        
+
         DrawLine(xA, xB, yA, yB, screenSpaceA.Z, screenSpaceB.Z, triangle.AData, triangle.BData, fragmentCallback);
         DrawLine(xB, xC, yB, yC, screenSpaceB.Z, screenSpaceC.Z, triangle.BData, triangle.CData, fragmentCallback);
         DrawLine(xC, xA, yC, yA, screenSpaceC.Z, screenSpaceA.Z, triangle.CData, triangle.AData, fragmentCallback);
@@ -83,7 +82,10 @@ public sealed class BresenhamRasterizer : IRasterizer<Vertex>
         {
             Position = new Vector3(w * (v0.Position.X * w0 + v1.Position.X * w1 + v1.Position.X * w2),
                 w * (v0.Position.Y * w0 + v1.Position.Y * w1 + v1.Position.Y * w2),
-                w * (v0.Position.Z * w0 + v1.Position.Z * w1 + v1.Position.Z * w2))
+                w * (v0.Position.Z * w0 + v1.Position.Z * w1 + v1.Position.Z * w2)),
+            Normal = Vector3.Normalize(w * (v0.Normal * w0 + v1.Normal * w1 + v1.Normal * w2)),
+            TextureCoordinates = new Vector2(w * (v0.TextureCoordinates.X * w0 + v1.TextureCoordinates.X * w1 + v1.TextureCoordinates.X * w2),
+                w * (v0.TextureCoordinates.Y * w0 + v1.TextureCoordinates.Y * w1 + v1.TextureCoordinates.Y * w2))
         };
     }
 

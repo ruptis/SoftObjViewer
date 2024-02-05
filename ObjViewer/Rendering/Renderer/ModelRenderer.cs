@@ -1,17 +1,18 @@
 ﻿using System.Drawing;
 using GraphicsPipeline;
+namespace ObjViewer.Rendering.Renderer;
 
-namespace ObjViewer.Rendering;
-
-public abstract class ModelRenderer<TV, TF, TR> : IModelRenderer 
+public abstract class ModelRenderer<TV, TF, TR> : IModelRenderer
     where TV : IVertexShader<Vertex, Vertex>, new()
     where TF : IFragmentShader<Vertex>, new()
     where TR : IRasterizer<Vertex>, new()
 {
     private readonly GraphicsPipeline<Vertex, Vertex> _graphicsPipeline;
 
-    protected ModelRenderer() => 
+    protected ModelRenderer()
+    {
         _graphicsPipeline = new GraphicsPipeline<Vertex, Vertex>(VertexShader, FragmentShader, Rasterizer);
+    }
 
     protected TV VertexShader { get; } = new();
     protected TF FragmentShader { get; } = new();

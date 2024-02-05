@@ -8,38 +8,47 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : struct where TFIn 
     private readonly IFragmentShader<TFIn> _fragmentShader;
     private readonly IRasterizer<TFIn> _rasterizer;
 
+    private readonly Action<int> _cachedRenderCallback;
     private readonly Action<Fragment<TFIn>> _cachedFragmentCallback;
 
     private IRenderTarget _renderTarget = null!;
+    private IReadOnlyList<TVIn> _vertices = null!;
+    private IReadOnlyList<int> _indices = null!;
 
     public GraphicsPipeline(IVertexShader<TVIn, TFIn> vertexShader, IFragmentShader<TFIn> fragmentShader, IRasterizer<TFIn> rasterizer)
     {
         _vertexShader = vertexShader;
         _fragmentShader = fragmentShader;
         _rasterizer = rasterizer;
+        _cachedRenderCallback = RenderTriangle;
         _cachedFragmentCallback = ProcessFragment;
     }
 
     public void Render(IReadOnlyList<TVIn> vertices, IReadOnlyList<int> indices, IRenderTarget renderTarget)
     {
         _renderTarget = renderTarget;
+        _vertices = vertices;
+        _indices = indices;
+
         _rasterizer.SetViewport(renderTarget.Width, renderTarget.Height);
-        
-        Parallel.For(0, indices.Count / 3, i => RenderTriangle(vertices, indices, i));
+
+        Parallel.For(0, indices.Count / 3, _cachedRenderCallback);
     }
-    private void RenderTriangle(IReadOnlyList<TVIn> vertices, IReadOnlyList<int> indices, int index)
+
+    private void RenderTriangle(int index)
     {
-        var i0 = indices[index * 3];
-        var i1 = indices[index * 3 + 1];
-        var i2 = indices[index * 3 + 2];
-        TVIn v0 = vertices[i0];
-        TVIn v1 = vertices[i1];
-        TVIn v2 = vertices[i2];
+        var triangleIndex = index * 3;
+        TVIn v0 = _vertices[_indices[triangleIndex]];
+        TVIn v1 = _vertices[_indices[triangleIndex + 1]];
+        TVIn v2 = _vertices[_indices[triangleIndex + 2]];
 
         _vertexShader.ProcessVertex(v0, out TFIn v0Out, out Vector4 position0);
+        //if (Clip(ref position0)) return;
         _vertexShader.ProcessVertex(v1, out TFIn v1Out, out Vector4 position1);
+        //if (Clip(ref position1)) return;
         _vertexShader.ProcessVertex(v2, out TFIn v2Out, out Vector4 position2);
-        
+        //if (Clip(ref position2)) return;
+
         var triangle = new Triangle<TFIn>
         {
             A = position0,
@@ -49,12 +58,15 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : struct where TFIn 
             BData = v1Out,
             CData = v2Out
         };
-        
+
         _rasterizer.Rasterize(in triangle, _cachedFragmentCallback);
     }
+
     private void ProcessFragment(Fragment<TFIn> fragment)
     {
         _fragmentShader.ProcessFragment(in fragment.Position, in fragment.Data, out Color color);
         _renderTarget.DrawPixel(fragment.Position.X, fragment.Position.Y, fragment.Position.Z, in color);
     }
+
+    private static bool Clip(ref Vector4 position) => position.X is >= -1 and <= 1 && position.Y is >= -1 and <= 1 && position.Z is >= 0 and <= 1;
 }

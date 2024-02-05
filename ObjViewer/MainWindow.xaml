@@ -5,18 +5,55 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ObjViewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1600">
+        Title="MainWindow" Height="900" Width="1600" d:DataContext="{d:DesignInstance local:MainViewModel}">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Orange" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+    </Window.Resources>
     <Grid>
-        <Image x:Name="Image"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Stretch="UniformToFill"/>
-        <TextBlock x:Name="TextBlock"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Margin="10"
-                    Foreground="NavajoWhite"
-                    FontSize="20"
-                    FontWeight="Bold"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*" />
+            <ColumnDefinition Width="0.5*" />
+        </Grid.ColumnDefinitions>
+        <Image Grid.ColumnSpan="2" x:Name="Image"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"
+               Stretch="UniformToFill" />
+        <!--make stylised combobox (orange text, bold, large font)-->
+        <ComboBox Grid.Column="1" ItemsSource="{Binding RenderModes}"
+                  SelectedItem="{Binding SelectedRenderMode}"
+                  DisplayMemberPath="Name"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Margin="10"
+                  Width="200" />
+        <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="FPS: " Margin="0,0,5,0" />
+                <TextBlock Text="{Binding Fps, StringFormat={}{0:N2}}" />
+                <TextBlock Text=" ms" Margin="5,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Frame Time: " Margin="0,0,5,0" />
+                <TextBlock Text="{Binding FrameTime, StringFormat={}{0:N2}}" />
+                <TextBlock Text=" ms" Margin="5,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Draw Time: " Margin="0,0,5,0" />
+                <TextBlock Text="{Binding DrawTime, StringFormat={}{0:N2}}" />
+                <TextBlock Text=" ms" Margin="5,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Vertices: " Margin="0,0,5,0" />
+                <TextBlock Text="{Binding VertexCount}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Triangles: " Margin="0,0,5,0" />
+                <TextBlock Text="{Binding TriangleCount}" />
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Window>

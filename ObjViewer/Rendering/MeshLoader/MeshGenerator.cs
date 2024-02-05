@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Numerics;
-namespace ObjViewer.Rendering;
+using System.Threading.Tasks;
+namespace ObjViewer.Rendering.MeshLoader;
 
-public static class MeshGenerator
+public class MeshGenerator : IMeshLoader
 {
-    public static Mesh CreateCube(float size = 1f)
+    private static Mesh CreateCube(float size = 1f)
     {
         List<Vertex> vertices = [];
         List<int> triangles = [];
@@ -21,7 +20,7 @@ public static class MeshGenerator
             new Vector3(-size / 2, -size / 2, size / 2),
             new Vector3(size / 2, -size / 2, size / 2),
             new Vector3(size / 2, size / 2, size / 2),
-            new Vector3(-size / 2, size / 2, size / 2),
+            new Vector3(-size / 2, size / 2, size / 2)
         ];
         Vector3[] cubeNormals =
         [
@@ -30,19 +29,19 @@ public static class MeshGenerator
             new Vector3(0, -1, 0),
             new Vector3(0, 1, 0),
             new Vector3(-1, 0, 0),
-            new Vector3(1, 0, 0),
+            new Vector3(1, 0, 0)
         ];
         Vector2[] cubeUVs =
         [
             new Vector2(0, 0),
             new Vector2(1, 0),
             new Vector2(1, 1),
-            new Vector2(0, 1),
+            new Vector2(0, 1)
         ];
-        
+
         for (var i = 0; i < 8; i++)
             vertices.Add(new Vertex(cubeVertices[i], cubeNormals[i / 4], cubeUVs[i % 4]));
-
+        
         int[] cubeTriangles =
         [
             0, 1, 2, 2, 3, 0,
@@ -57,7 +56,7 @@ public static class MeshGenerator
         return new Mesh(vertices, triangles);
     }
 
-    public static Mesh CreateSphere(float radius = 1f, int segments = 16)
+    private static Mesh CreateSphere(float radius = 1f, int segments = 16)
     {
         List<Vertex> vertices = [];
         List<int> triangles = [];
@@ -93,7 +92,7 @@ public static class MeshGenerator
         return new Mesh(vertices, triangles);
     }
 
-    public static Mesh CreatePlane(float size = 1f, int segments = 1)
+    private static Mesh CreatePlane(float size = 1f, int segments = 1)
     {
         List<Vertex> vertices = [];
         List<int> triangles = [];
@@ -124,5 +123,16 @@ public static class MeshGenerator
         }
 
         return new Mesh(vertices, triangles);
+    }
+    public Task<Mesh> LoadMeshAsync(string path)
+    {
+        var parts = path.Split(' ');
+        return parts[0].ToLower() switch
+        {
+            "cube" => Task.FromResult(CreateCube(parts.Length > 1 ? float.Parse(parts[1]) : 1)),
+            "sphere" => Task.FromResult(CreateSphere(parts.Length > 1 ? float.Parse(parts[1]) : 1, parts.Length > 2 ? int.Parse(parts[2]) : 16)),
+            "plane" => Task.FromResult(CreatePlane(parts.Length > 1 ? float.Parse(parts[1]) : 1, parts.Length > 2 ? int.Parse(parts[2]) : 1)),
+            _ => throw new ArgumentException("Invalid mesh type")
+        };
     }
 }

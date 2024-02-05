@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 using GraphicsPipeline;
-namespace ObjViewer.Rendering;
+namespace ObjViewer.Rendering.Renderer;
 
 public interface IModelRenderer
 {
