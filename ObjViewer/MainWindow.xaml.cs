@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ObjViewer.Rendering;
+using Camera = ObjViewer.Rendering.Camera;
 using Transform = ObjViewer.Rendering.Transform;
 namespace ObjViewer
 {
@@ -15,8 +16,10 @@ namespace ObjViewer
     public partial class MainWindow
     {
         private readonly Camera _camera;
-        private readonly Renderer _renderer;
         private readonly Model _model;
+        private readonly BitmapRenderTarget _renderTarget;
+
+        private readonly IModelRenderer _renderer = new WireframeRenderer();
 
         private readonly Stopwatch _uiUpdateTimer = new();
         private readonly Stopwatch _frameTimer = new();
@@ -36,19 +39,15 @@ namespace ObjViewer
                 PixelFormats.Bgra32,
                 null);
             
-            _renderer = new Renderer
-            {
-                RenderTarget = new BitmapRenderTarget(bitmap)
-            };
-            
             Image.Source = bitmap;
+            _renderTarget = new BitmapRenderTarget(bitmap);
 
             _camera = new Camera(bitmap.PixelWidth / (float)bitmap.PixelHeight);
             _camera.Transform.Position = new Vector3(0, 2, 8);
             _camera.Transform.LookAt(Vector3.Zero, Vector3.UnitY);
 
-            //Mesh mesh = MeshGenerator.CreateCube(4);
-            Mesh mesh = MeshGenerator.CreateSphere(2, 128);
+            Mesh mesh = MeshGenerator.CreateCube(4);
+            //Mesh mesh = MeshGenerator.CreateSphere(2, 128);
             _model = new Model
             {
                 Mesh = mesh,
@@ -69,13 +68,9 @@ namespace ObjViewer
         {
             var frameTime = _frameTimer.Elapsed.TotalSeconds;
             _frameTimer.Restart();
-
-            _renderer.Model = _model.Transform.WorldMatrix;
-            _renderer.View = _camera.ViewMatrix;
-            _renderer.Projection = _camera.ProjectionMatrix;
             
             _drawTimer.Restart();
-            _renderer.DrawMesh(_model.Mesh);
+            _renderer.DrawModel(_model, _camera, _renderTarget);
             _drawTimer.Stop();
             
             UpdateUI(_drawTimer.Elapsed.TotalSeconds, frameTime);
