@@ -6,9 +6,9 @@ namespace ObjViewer.Rendering.Rasterization;
 public sealed class BresenhamRasterizer : IRasterizer<Vertex>
 {
     private int _height;
+    private int _width;
 
     private Matrix4x4 _screenSpaceTransform;
-    private int _width;
 
     public void SetViewport(int width, int height)
     {

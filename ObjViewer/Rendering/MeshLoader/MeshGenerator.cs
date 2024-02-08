@@ -44,12 +44,12 @@ public class MeshGenerator : IMeshLoader
         
         int[] cubeTriangles =
         [
-            0, 1, 2, 2, 3, 0,
-            4, 5, 6, 6, 7, 4,
-            0, 4, 7, 7, 3, 0,
-            1, 5, 6, 6, 2, 1,
-            0, 1, 5, 5, 4, 0,
-            2, 3, 7, 7, 6, 2
+            0, 2, 1, 0, 3, 2,
+            1, 6, 5, 1, 2, 6,
+            5, 7, 4, 5, 6, 7,
+            4, 3, 0, 4, 7, 3,
+            3, 6, 2, 3, 7, 6,
+            4, 1, 5, 4, 0, 1
         ];
         triangles.AddRange(cubeTriangles);
 
@@ -73,7 +73,7 @@ public class MeshGenerator : IMeshLoader
                 vertices.Add(new Vertex(new Vector3(x, y, z) * radius, new Vector3(x, y, z), new Vector2(j / (float)segments, i / (float)segments)));
             }
         }
-
+        
         for (var i = 0; i < segments; i++)
         {
             for (var j = 0; j < segments; j++)
@@ -81,11 +81,11 @@ public class MeshGenerator : IMeshLoader
                 var a = i * (segments + 1) + j;
                 var b = a + segments + 1;
                 triangles.Add(a);
-                triangles.Add(b);
                 triangles.Add(a + 1);
                 triangles.Add(b);
+                triangles.Add(b);
+                triangles.Add(a + 1);
                 triangles.Add(b + 1);
-                triangles.Add(a + 1);
             }
         }
 

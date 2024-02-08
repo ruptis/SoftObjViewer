@@ -19,7 +19,7 @@ public sealed class BitmapRenderTarget(WriteableBitmap bitmap) : IRenderTarget
         var index = (int)(y * Width + x);
         if (_depthBuffer[index] >= z)
             return;
-
+        
         _depthBuffer[index] = z;
         _backBuffer[index] = color.ToArgb();
     }

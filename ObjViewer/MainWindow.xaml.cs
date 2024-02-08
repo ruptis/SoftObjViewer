@@ -39,8 +39,8 @@ public partial class MainWindow
         InitializeComponent();
         
         var bitmap = new WriteableBitmap(
-            1600,
-            900,
+            (int)Width,
+            (int)Height,
             96,
             96,
             PixelFormats.Bgra32,
@@ -79,7 +79,7 @@ public partial class MainWindow
     {
         var frameTime = _frameTimer.Elapsed.TotalMilliseconds;
         _frameTimer.Restart();
-
+        
         _drawTimer.Restart();
         Renderer.DrawModel(_model, _camera, _renderTarget);
         _drawTimer.Stop();

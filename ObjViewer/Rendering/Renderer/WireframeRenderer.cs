@@ -3,7 +3,7 @@ using ObjViewer.Rendering.Rasterization;
 using ObjViewer.Rendering.Shaders;
 namespace ObjViewer.Rendering.Renderer;
 
-public sealed class WireframeRenderer : ModelRenderer<SimpleVertexShader, LamberianFragmentShader, BresenhamRasterizer>
+public sealed class WireframeRenderer : ModelRenderer<SimpleVertexShader, SimpleFragmentShader, BresenhamRasterizer>
 {
     protected override void OnDraw(in Model model, in Camera camera, in IRenderTarget renderTarget)
     {

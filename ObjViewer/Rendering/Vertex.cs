@@ -1,4 +1,4 @@
 ﻿using System.Numerics;
 namespace ObjViewer.Rendering;
 
-public record struct Vertex(Vector3 Position, Vector3 Normal, Vector2 TextureCoordinates);
+public readonly record struct Vertex(Vector3 Position, Vector3 Normal, Vector2 TextureCoordinates);

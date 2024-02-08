@@ -7,9 +7,9 @@ namespace ObjViewer.Rendering.Rasterization;
 public sealed class TriangleRasterizer : IRasterizer<Vertex>
 {
     private int _height;
-
-    private Matrix4x4 _screenSpaceTransform;
     private int _width;
+    
+    private Matrix4x4 _screenSpaceTransform;
 
     public void SetViewport(int width, int height)
     {
@@ -20,8 +20,8 @@ public sealed class TriangleRasterizer : IRasterizer<Vertex>
 
     public void Rasterize(in Triangle<Vertex> triangle, Action<Fragment<Vertex>> fragmentCallback)
     {
-        /*if (CullTriangle(triangle))
-            return;*/
+        if (CullTriangle(triangle))
+            return;
 
         Vector3 screenSpaceA = ToScreenSpace(triangle.A);
         Vector3 screenSpaceB = ToScreenSpace(triangle.B);
@@ -37,7 +37,8 @@ public sealed class TriangleRasterizer : IRasterizer<Vertex>
     private static bool CullTriangle(in Triangle<Vertex> triangle)
     {
         Vector3 normal = Vector3.Cross(ToVector3(triangle.B - triangle.A), ToVector3(triangle.C - triangle.A));
-        return Vector3.Dot(normal, ToVector3(triangle.A)) < 0;
+        Vector3 viewDirection = ToVector3(-triangle.A);
+        return Vector3.Dot(normal, viewDirection) < 0;
     }
 
     private void DrawTriangle(ref Vector3 p1, ref Vector3 p2, ref Vector3 p3, ref Vertex v1, ref Vertex v2, ref Vertex v3, Action<Fragment<Vertex>> callback)
@@ -115,6 +116,6 @@ public sealed class TriangleRasterizer : IRasterizer<Vertex>
     {
         Position = Lerp(min.Position, max.Position, gradient),
         Normal = Lerp(min.Normal, max.Normal, gradient),
-        TextureCoordinates = Lerp(min.TextureCoordinates, max.TextureCoordinates, gradient)
+        TextureCoordinates = Lerp(min.TextureCoordinates, max.TextureCoordinates, gradient),
     };
 }

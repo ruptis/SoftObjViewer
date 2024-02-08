@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 using GraphicsPipeline;
 namespace ObjViewer.Rendering.Shaders;
 
@@ -21,7 +22,7 @@ public sealed class SimpleVertexShader : IVertexShader<Vertex, Vertex>
         output = input with
         {
             Position = worldPosition,
-            Normal = normal
+            Normal = normal,
         };
     }
 }

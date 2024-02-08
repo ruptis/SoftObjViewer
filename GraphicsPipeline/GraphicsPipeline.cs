@@ -43,11 +43,8 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : struct where TFIn 
         TVIn v2 = _vertices[_indices[triangleIndex + 2]];
 
         _vertexShader.ProcessVertex(v0, out TFIn v0Out, out Vector4 position0);
-        //if (Clip(ref position0)) return;
         _vertexShader.ProcessVertex(v1, out TFIn v1Out, out Vector4 position1);
-        //if (Clip(ref position1)) return;
         _vertexShader.ProcessVertex(v2, out TFIn v2Out, out Vector4 position2);
-        //if (Clip(ref position2)) return;
 
         var triangle = new Triangle<TFIn>
         {
@@ -67,6 +64,4 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : struct where TFIn 
         _fragmentShader.ProcessFragment(in fragment.Position, in fragment.Data, out Color color);
         _renderTarget.DrawPixel(fragment.Position.X, fragment.Position.Y, fragment.Position.Z, in color);
     }
-
-    private static bool Clip(ref Vector4 position) => position.X is >= -1 and <= 1 && position.Y is >= -1 and <= 1 && position.Z is >= 0 and <= 1;
 }
