@@ -69,7 +69,7 @@ public sealed class BresenhamRasterizer : IRasterizer<Vertex>
         }
     }
 
-    private Vertex Interpolate(in Vertex v0, in Vertex v1, int x0, int y0, int x1, int y1)
+    private static Vertex Interpolate(in Vertex v0, in Vertex v1, int x0, int y0, int x1, int y1)
     {
         if (x0 == x1 || y0 == y1)
             return v0;
@@ -91,6 +91,5 @@ public sealed class BresenhamRasterizer : IRasterizer<Vertex>
 
     private bool IsInside(int x, int y) => x >= 0 && x < _width && y >= 0 && y < _height;
 
-    private Vector3 ToScreenSpace(in Vector4 position) => ToVector3(Vector4.Transform(position, _screenSpaceTransform));
-    private static Vector3 ToVector3(in Vector4 position) => new(position.X, position.Y, position.Z);
+    private Vector3 ToScreenSpace(in Vector4 position) => Vector4.Transform(position, _screenSpaceTransform).AsVector3();
 }

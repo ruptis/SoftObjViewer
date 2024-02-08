@@ -13,9 +13,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         RenderModes = new ObservableCollection<RenderMode>
         {
             new("Wireframe", new WireframeRenderer()),
-            new("Flat", new FlatRenderer()),
+            new("Wireframe Lambert", new WireframeLambertRenderer()),
+            new("Flat Lambert", new FlatLambertRenderer()),
+            new("Lambert", new LambertRenderer()),
+            new("Phong", new PhongRenderer())
         };
-        _selectedRenderMode = RenderModes[1];
+        _selectedRenderMode = RenderModes[4];
     }
     
     public ObservableCollection<RenderMode> RenderModes { get; }

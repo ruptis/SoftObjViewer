@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Numerics;
-using System.Runtime.Intrinsics;
 using GraphicsPipeline;
 namespace ObjViewer.Rendering.Rasterization;
 
-public sealed class TriangleRasterizer : IRasterizer<Vertex>
+public class TriangleRasterizer : IRasterizer<Vertex>
 {
     private int _height;
     private int _width;
-    
+
     private Matrix4x4 _screenSpaceTransform;
+
+    public bool InterpolationEnabled { get; set; } = true;
 
     public void SetViewport(int width, int height)
     {
@@ -31,17 +32,23 @@ public sealed class TriangleRasterizer : IRasterizer<Vertex>
         Vertex triangleBData = triangle.BData;
         Vertex triangleCData = triangle.CData;
 
-        DrawTriangle(ref screenSpaceA, ref screenSpaceB, ref screenSpaceC, ref triangleAData, ref triangleBData, ref triangleCData, fragmentCallback);
+        Vertex average = InterpolationEnabled ? default : new Vertex
+        {
+            Position = (triangleAData.Position + triangleBData.Position + triangleCData.Position) / 3,
+            Normal = (triangleAData.Normal + triangleBData.Normal + triangleCData.Normal) / 3,
+            TextureCoordinates = (triangleAData.TextureCoordinates + triangleBData.TextureCoordinates + triangleCData.TextureCoordinates) / 3
+        };
+        DrawTriangle(ref screenSpaceA, ref screenSpaceB, ref screenSpaceC, ref triangleAData, ref triangleBData, ref triangleCData, fragmentCallback, ref average);
     }
 
     private static bool CullTriangle(in Triangle<Vertex> triangle)
     {
-        Vector3 normal = Vector3.Cross(ToVector3(triangle.B - triangle.A), ToVector3(triangle.C - triangle.A));
-        Vector3 viewDirection = ToVector3(-triangle.A);
+        Vector3 normal = Vector3.Cross((triangle.B - triangle.A).AsVector3(), (triangle.C - triangle.A).AsVector3());
+        Vector3 viewDirection = (-triangle.A).AsVector3();
         return Vector3.Dot(normal, viewDirection) < 0;
     }
 
-    private void DrawTriangle(ref Vector3 p1, ref Vector3 p2, ref Vector3 p3, ref Vertex v1, ref Vertex v2, ref Vertex v3, Action<Fragment<Vertex>> callback)
+    private void DrawTriangle(ref Vector3 p1, ref Vector3 p2, ref Vector3 p3, ref Vertex v1, ref Vertex v2, ref Vertex v3, Action<Fragment<Vertex>> callback, ref Vertex average)
     {
         if (p1.Y > p2.Y)
         {
@@ -61,41 +68,45 @@ public sealed class TriangleRasterizer : IRasterizer<Vertex>
             (v1, v2) = (v2, v1);
         }
 
-        var invSlope1 = p2.Y - p1.Y > 0 ? (p2.X - p1.X) / (p2.Y - p1.Y) : 0;
-        var invSlope2 = p3.Y - p1.Y > 0 ? (p3.X - p1.X) / (p3.Y - p1.Y) : 0;
-
-        if (invSlope1 > invSlope2)
+        if (MathUtils.Cross((p2 - p1).AsVector2(), (p3 - p1).AsVector2()) >= 0f)
             for (var y = (int)p1.Y; y <= (int)p3.Y; y++)
-                if (y < p2.Y)
-                    ProcessScanLine(y, ref p1, ref p3, ref p1, ref p2, ref v1, ref v3, ref v1, ref v2, callback);
+            {
+                if (y < (int)p2.Y)
+                    ProcessScanLine(y, ref p1, ref p3, ref p1, ref p2, ref v1, ref v3, ref v1, ref v2, callback, ref average);
                 else
-                    ProcessScanLine(y, ref p1, ref p3, ref p2, ref p3, ref v1, ref v3, ref v2, ref v3, callback);
+                    ProcessScanLine(y, ref p1, ref p3, ref p2, ref p3, ref v1, ref v3, ref v2, ref v3, callback, ref average);
+            }
         else
             for (var y = (int)p1.Y; y <= (int)p3.Y; y++)
-                if (y < p2.Y)
-                    ProcessScanLine(y, ref p1, ref p2, ref p1, ref p3, ref v1, ref v2, ref v1, ref v3, callback);
+            {
+                if (y < (int)p2.Y)
+                    ProcessScanLine(y, ref p1, ref p2, ref p1, ref p3, ref v1, ref v2, ref v1, ref v3, callback, ref average);
                 else
-                    ProcessScanLine(y, ref p2, ref p3, ref p1, ref p3, ref v2, ref v3, ref v1, ref v3, callback);
+                    ProcessScanLine(y, ref p2, ref p3, ref p1, ref p3, ref v2, ref v3, ref v1, ref v3, callback, ref average);
+            }
     }
-    private void ProcessScanLine(int y, ref Vector3 pa, ref Vector3 pb, ref Vector3 pc, ref Vector3 pd, ref Vertex va, ref Vertex vb, ref Vertex vc, ref Vertex vd, Action<Fragment<Vertex>> callback)
+
+
+    private void ProcessScanLine(int y, ref Vector3 pa, ref Vector3 pb, ref Vector3 pc, ref Vector3 pd, ref Vertex va, ref Vertex vb, ref Vertex vc, ref Vertex vd, Action<Fragment<Vertex>> callback, ref Vertex average)
     {
-        var gradient1 = Math.Abs(pb.Y - pa.Y) > 0 ? (y - pa.Y) / (pb.Y - pa.Y) : 1;
-        var gradient2 = Math.Abs(pd.Y - pc.Y) > 0 ? (y - pc.Y) / (pd.Y - pc.Y) : 1;
+        var gradient1 = MathF.Abs(pb.Y - pa.Y) > 0f ? (y - pa.Y) / (pb.Y - pa.Y) : 1f;
+        var gradient2 = MathF.Abs(pd.Y - pc.Y) > 0f ? (y - pc.Y) / (pd.Y - pc.Y) : 1f;
 
-        var sx = (int)Lerp(pa.X, pb.X, gradient1);
-        var ex = (int)Lerp(pc.X, pd.X, gradient2);
+        var sx = (int)MathUtils.Lerp(pa.X, pb.X, gradient1);
+        var ex = (int)MathUtils.Lerp(pc.X, pd.X, gradient2);
 
-        var z1 = Lerp(pa.Z, pb.Z, gradient1);
-        var z2 = Lerp(pc.Z, pd.Z, gradient2);
+        var z1 = MathUtils.Lerp(pa.Z, pb.Z, gradient1);
+        var z2 = MathUtils.Lerp(pc.Z, pd.Z, gradient2);
 
-        Vertex v1 = Lerp(va, vb, gradient1);
-        Vertex v2 = Lerp(vc, vd, gradient2);
+
+        Vertex v1 = InterpolationEnabled ? MathUtils.Lerp(va, vb, gradient1) : average;
+        Vertex v2 = InterpolationEnabled ? MathUtils.Lerp(vc, vd, gradient2) : average;
 
         for (var x = sx; x < ex; x++)
         {
             var gradient = (x - sx) / (float)(ex - sx);
-            var z = Lerp(z1, z2, gradient);
-            Vertex v = Lerp(v1, v2, gradient);
+            var z = MathUtils.Lerp(z1, z2, gradient);
+            Vertex v = InterpolationEnabled ? MathUtils.Lerp(v1, v2, gradient) : average;
             if (IsInside(x, y))
                 callback(new Fragment<Vertex>
                 {
@@ -106,16 +117,6 @@ public sealed class TriangleRasterizer : IRasterizer<Vertex>
     }
 
     private bool IsInside(int x, int y) => x >= 0 && x < _width && y >= 0 && y < _height;
-    private Vector3 ToScreenSpace(in Vector4 position) => ToVector3(Vector4.Transform(position, _screenSpaceTransform));
-    private static Vector3 ToVector3(in Vector4 position) => position.AsVector128().AsVector3();
-    private static float Clamp01(float value) => MathF.Max(0, MathF.Min(1, value));
-    private static float Lerp(float min, float max, float gradient) => min + (max - min) * Clamp01(gradient);
-    private static Vector2 Lerp(Vector2 min, Vector2 max, float gradient) => min + (max - min) * Clamp01(gradient);
-    private static Vector3 Lerp(Vector3 min, Vector3 max, float gradient) => min + (max - min) * Clamp01(gradient);
-    private static Vertex Lerp(Vertex min, Vertex max, float gradient) => new()
-    {
-        Position = Lerp(min.Position, max.Position, gradient),
-        Normal = Lerp(min.Normal, max.Normal, gradient),
-        TextureCoordinates = Lerp(min.TextureCoordinates, max.TextureCoordinates, gradient),
-    };
+    private Vector3 ToScreenSpace(in Vector4 position) => Vector4.Transform(position, _screenSpaceTransform).AsVector3();
+
 }
