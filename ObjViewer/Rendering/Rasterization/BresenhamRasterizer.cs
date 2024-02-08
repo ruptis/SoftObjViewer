@@ -71,22 +71,11 @@ public sealed class BresenhamRasterizer : IRasterizer<Vertex>
 
     private static Vertex Interpolate(in Vertex v0, in Vertex v1, int x0, int y0, int x1, int y1)
     {
-        if (x0 == x1 || y0 == y1)
+        if (x0 == x1 && y0 == y1)
             return v0;
-
-        var w0 = (x1 - x0) * (y1 - y0);
-        var w1 = (x0 - x1) * (y1 - y0);
-        var w2 = (x0 - x1) * (y0 - y1);
-        var w = 1.0f / ((x1 - x0) * (y1 - y0));
-        return new Vertex
-        {
-            Position = new Vector3(w * (v0.Position.X * w0 + v1.Position.X * w1 + v1.Position.X * w2),
-                w * (v0.Position.Y * w0 + v1.Position.Y * w1 + v1.Position.Y * w2),
-                w * (v0.Position.Z * w0 + v1.Position.Z * w1 + v1.Position.Z * w2)),
-            Normal = Vector3.Normalize(w * (v0.Normal * w0 + v1.Normal * w1 + v1.Normal * w2)),
-            TextureCoordinates = new Vector2(w * (v0.TextureCoordinates.X * w0 + v1.TextureCoordinates.X * w1 + v1.TextureCoordinates.X * w2),
-                w * (v0.TextureCoordinates.Y * w0 + v1.TextureCoordinates.Y * w1 + v1.TextureCoordinates.Y * w2))
-        };
+        
+        var gradient = (float)(x1 - x0) / (y1 - y0);
+        return MathUtils.Lerp(v0, v1, gradient);
     }
 
     private bool IsInside(int x, int y) => x >= 0 && x < _width && y >= 0 && y < _height;

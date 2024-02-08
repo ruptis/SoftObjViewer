@@ -18,7 +18,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             new("Lambert", new LambertRenderer()),
             new("Phong", new PhongRenderer())
         };
-        _selectedRenderMode = RenderModes[4];
+        _selectedRenderMode = RenderModes[0];
     }
     
     public ObservableCollection<RenderMode> RenderModes { get; }

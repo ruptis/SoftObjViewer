@@ -66,11 +66,11 @@ public partial class MainWindow
     {
         _model = new Model
         {
-            Mesh = await MeshLoader.LoadMeshAsync("sphere 3"),
+            Mesh = await MeshLoader.LoadMeshAsync("sphere 3 128"),
             Transform = new Transform
             {
                 Position = Vector3.Zero,
-                Scale = new Vector3(1, 1, 1)
+                Scale = new Vector3(1, 2, 1)
             }
         };
     }

@@ -106,7 +106,7 @@ public class MeshGenerator : IMeshLoader
                 vertices.Add(new Vertex(new Vector3(x, 0, z), Vector3.UnitY, new Vector2(j / (float)segments, i / (float)segments)));
             }
         }
-
+        
         for (var i = 0; i < segments; i++)
         {
             for (var j = 0; j < segments; j++)
@@ -114,11 +114,11 @@ public class MeshGenerator : IMeshLoader
                 var a = i * (segments + 1) + j;
                 var b = a + segments + 1;
                 triangles.Add(a);
-                triangles.Add(b);
                 triangles.Add(a + 1);
                 triangles.Add(b);
+                triangles.Add(b);
+                triangles.Add(a + 1);
                 triangles.Add(b + 1);
-                triangles.Add(a + 1);
             }
         }
 
