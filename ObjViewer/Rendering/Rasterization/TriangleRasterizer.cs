@@ -3,7 +3,7 @@ using System.Numerics;
 using GraphicsPipeline;
 namespace ObjViewer.Rendering.Rasterization;
 
-public class TriangleRasterizer : IRasterizer<Vertex>
+public sealed class TriangleRasterizer : IRasterizer<Vertex>
 {
     private int _height;
     private int _width;
@@ -97,8 +97,7 @@ public class TriangleRasterizer : IRasterizer<Vertex>
 
         var z1 = MathUtils.Lerp(pa.Z, pb.Z, gradient1);
         var z2 = MathUtils.Lerp(pc.Z, pd.Z, gradient2);
-
-
+        
         Vertex v1 = InterpolationEnabled ? MathUtils.Lerp(va, vb, gradient1) : average;
         Vertex v2 = InterpolationEnabled ? MathUtils.Lerp(vc, vd, gradient2) : average;
 

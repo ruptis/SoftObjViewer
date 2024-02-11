@@ -46,6 +46,9 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : struct where TFIn 
         _vertexShader.ProcessVertex(v1, out TFIn v1Out, out Vector4 position1);
         _vertexShader.ProcessVertex(v2, out TFIn v2Out, out Vector4 position2);
 
+        if (ClipTriangle(ref position0, ref position1, ref position2))
+            return;
+
         var triangle = new Triangle<TFIn>
         {
             A = position0,
@@ -58,10 +61,33 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : struct where TFIn 
 
         _rasterizer.Rasterize(in triangle, _cachedFragmentCallback);
     }
-
+    
     private void ProcessFragment(Fragment<TFIn> fragment)
     {
         _fragmentShader.ProcessFragment(in fragment.Position, in fragment.Data, out Color color);
         _renderTarget.DrawPixel(fragment.Position.X, fragment.Position.Y, fragment.Position.Z, in color);
+    }
+    
+    private static bool ClipTriangle(ref Vector4 position0, ref Vector4 position1, ref Vector4 position2)
+    {
+        if (position0.W < 0 || position1.W < 0 || position2.W < 0)
+            return true;
+        
+        if (position0.W > position0.Z || position1.W > position1.Z || position2.W > position2.Z)
+            return true;
+
+        if (position0.X < -position0.W && position1.X < -position1.W && position2.X < -position2.W)
+            return true;
+
+        if (position0.X > position0.W && position1.X > position1.W && position2.X > position2.W)
+            return true;
+
+        if (position0.Y < -position0.W && position1.Y < -position1.W && position2.Y < -position2.W)
+            return true;
+
+        if (position0.Y > position0.W && position1.Y > position1.W && position2.Y > position2.W)
+            return true;
+
+        return position0.Z < 0 && position1.Z < 0 && position2.Z < 0;
     }
 }
