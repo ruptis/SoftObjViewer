@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Input;
@@ -20,7 +21,7 @@ public partial class MainWindow
     private readonly MainViewModel _viewModel = new();
 
     private IModelRenderer Renderer => _viewModel.SelectedRenderMode.Renderer;
-    private IMeshLoader MeshLoader => new MeshGenerator();
+    private IMeshLoader MeshLoader => new ObjParser();
 
     private Model _model = new();
     
@@ -66,11 +67,11 @@ public partial class MainWindow
     {
         _model = new Model
         {
-            Mesh = await MeshLoader.LoadMeshAsync("sphere 3 128"),
+            Mesh = await MeshLoader.LoadMeshAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\", "ModelSamples\\cube.obj")),
             Transform = new Transform
             {
                 Position = Vector3.Zero,
-                Scale = new Vector3(1, 2, 1)
+                Scale = new Vector3(1, 1, 1)
             }
         };
     }
