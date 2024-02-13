@@ -9,14 +9,18 @@ public abstract class ModelRenderer<TV, TF, TR> : IModelRenderer
 {
     private readonly GraphicsPipeline<Vertex, Vertex> _graphicsPipeline;
 
-    protected ModelRenderer()
-    {
+    protected ModelRenderer() => 
         _graphicsPipeline = new GraphicsPipeline<Vertex, Vertex>(VertexShader, FragmentShader, Rasterizer);
-    }
 
     protected TV VertexShader { get; } = new();
     protected TF FragmentShader { get; } = new();
     protected TR Rasterizer { get; } = new();
+
+    protected bool BackfaceCulling
+    {
+        get => _graphicsPipeline.BackfaceCullingEnabled; 
+        set => _graphicsPipeline.BackfaceCullingEnabled = value;
+    }
 
     public Color ClearColor { get; set; } = Color.SlateGray;
 

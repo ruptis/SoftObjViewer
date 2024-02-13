@@ -16,7 +16,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
             new("Wireframe Lambert", new WireframeLambertRenderer()),
             new("Flat Lambert", new FlatLambertRenderer()),
             new("Lambert", new LambertRenderer()),
-            new("Phong", new PhongRenderer())
+            new("Phong", new PhongRenderer()),
+            new("Normal", new NormalRenderer()),
+            new("UV", new UvRenderer())
         };
         _selectedRenderMode = RenderModes[0];
     }

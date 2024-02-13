@@ -67,11 +67,11 @@ public partial class MainWindow
     {
         _model = new Model
         {
-            Mesh = await MeshLoader.LoadMeshAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\", "ModelSamples\\cube.obj")),
+            Mesh = await MeshLoader.LoadMeshAsync("ModelSamples/cube.obj"),
             Transform = new Transform
             {
                 Position = Vector3.Zero,
-                Scale = new Vector3(1, 1, 1)
+                Scale = new Vector3(1f)
             }
         };
     }
@@ -136,7 +136,7 @@ public partial class MainWindow
         _previousMousePosition = currentMousePosition;
 
         var angleX = -delta.X * 0.01f;
-        var angleY = delta.Y * 0.01f;
+        var angleY = -delta.Y * 0.01f;
 
         _camera.Transform.RotateAround(Vector3.Zero, Vector3.UnitY, angleX);
         _camera.Transform.RotateAround(Vector3.Zero, _camera.Transform.Right, angleY);

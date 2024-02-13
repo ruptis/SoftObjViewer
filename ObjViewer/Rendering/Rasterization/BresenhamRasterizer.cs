@@ -40,45 +40,42 @@ public sealed class BresenhamRasterizer : IRasterizer<Vertex>
         var dy = Math.Abs(y1 - y0);
         var sx = x0 < x1 ? 1 : -1;
         var sy = y0 < y1 ? 1 : -1;
-        var err = dx - dy;
+        var error = dx - dy;
 
         while (true)
         {
             if (IsInside(x0, y0))
             {
+                var gradient = x1 - x0 != 0 ? (float)(x0 - x1) / (x0 - x1) : 1;
                 callback(new Fragment<Vertex>
                 {
-                    Position = new Vector3(x0, y0, (z0 + z1) / 2),
-                    Data = Interpolate(v0, v1, x0, y0, x1, y1)
+                    Position = new Vector3(x0, y0, float.Lerp(z0, z1, gradient)),
+                    Data = Interpolate(v0, v1, gradient)
                 });
             }
 
             if (x0 == x1 && y0 == y1)
                 break;
-            var e2 = 2 * err;
+            var e2 = 2 * error;
             if (e2 > -dy)
             {
-                err -= dy;
+                error -= dy;
                 x0 += sx;
             }
             if (e2 < dx)
             {
-                err += dx;
+                error += dx;
                 y0 += sy;
             }
         }
     }
-
-    private static Vertex Interpolate(in Vertex v0, in Vertex v1, int x0, int y0, int x1, int y1)
-    {
-        if (x0 == x1 && y0 == y1)
-            return v0;
-        
-        var gradient = (float)(x1 - x0) / (y1 - y0);
-        return MathUtils.Lerp(v0, v1, gradient);
-    }
-
+    
     private bool IsInside(int x, int y) => x >= 0 && x < _width && y >= 0 && y < _height;
 
     private Vector3 ToScreenSpace(in Vector4 position) => Vector4.Transform(position, _screenSpaceTransform).AsVector3();
+    private static Vertex Interpolate(in Vertex v0, in Vertex v1, float gradient) => new()
+    {
+        Position = Vector3.Lerp(v0.Position, v1.Position, gradient),
+        Normal = Vector3.Lerp(v0.Normal, v1.Normal, gradient),
+    };
 }

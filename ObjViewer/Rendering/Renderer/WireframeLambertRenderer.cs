@@ -4,13 +4,13 @@ using ObjViewer.Rendering.Rasterization;
 using ObjViewer.Rendering.Shaders;
 namespace ObjViewer.Rendering.Renderer;
 
-public sealed class WireframeLambertRenderer : ModelRenderer<SimpleVertexShader, LamberianFragmentShader, BresenhamRasterizer>
+public sealed class WireframeLambertRenderer : SimpleRenderer<LamberianFragmentShader, BresenhamRasterizer>
 {
     private static readonly Vector3 LightPosition = new(0, 2, 8);
     protected override void OnDraw(in Model model, in Camera camera, in IRenderTarget renderTarget)
     {
-        VertexShader.Model = model.Transform.WorldMatrix;
-        VertexShader.Mvp = model.Transform.WorldMatrix * camera.ViewMatrix * camera.ProjectionMatrix;
+        base.OnDraw(model, camera, renderTarget);
+        BackfaceCulling = false;
         
         FragmentShader.LightPosition = LightPosition;
     }

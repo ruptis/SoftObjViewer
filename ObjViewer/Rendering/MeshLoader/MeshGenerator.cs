@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 namespace ObjViewer.Rendering.MeshLoader;
@@ -11,47 +12,54 @@ public class MeshGenerator : IMeshLoader
         List<Vertex> vertices = [];
         List<int> triangles = [];
 
-        Vector3[] cubeVertices =
+        var halfSize = size / 2;
+        Vector3[] positions =
         [
-            new Vector3(-size / 2, -size / 2, -size / 2),
-            new Vector3(size / 2, -size / 2, -size / 2),
-            new Vector3(size / 2, size / 2, -size / 2),
-            new Vector3(-size / 2, size / 2, -size / 2),
-            new Vector3(-size / 2, -size / 2, size / 2),
-            new Vector3(size / 2, -size / 2, size / 2),
-            new Vector3(size / 2, size / 2, size / 2),
-            new Vector3(-size / 2, size / 2, size / 2)
+            new Vector3(-halfSize, -halfSize, -halfSize),
+            new Vector3(halfSize, -halfSize, -halfSize),
+            new Vector3(halfSize, halfSize, -halfSize),
+            new Vector3(-halfSize, halfSize, -halfSize),
+            new Vector3(-halfSize, -halfSize, halfSize),
+            new Vector3(halfSize, -halfSize, halfSize),
+            new Vector3(halfSize, halfSize, halfSize),
+            new Vector3(-halfSize, halfSize, halfSize)
         ];
-        Vector3[] cubeNormals =
+
+        Vector3[] normals =
         [
-            new Vector3(0, 0, -1),
-            new Vector3(1, 0, 0),
-            new Vector3(0, 0, 1),
-            new Vector3(-1, 0, 0),
-            new Vector3(0, 1, 0),
-            new Vector3(0, -1, 0)
+            -Vector3.UnitZ,
+            Vector3.UnitZ,
+            -Vector3.UnitX,
+            Vector3.UnitX,
+            -Vector3.UnitY,
+            Vector3.UnitY
         ];
-        Vector2[] cubeUVs =
+
+        Vector2[] uvs =
         [
             new Vector2(0, 0),
             new Vector2(1, 0),
             new Vector2(1, 1),
-            new Vector2(0, 1)
+            new Vector2(1, 1),
+            new Vector2(0, 1),
+            new Vector2(0, 0)
         ];
 
-        for (var i = 0; i < 8; i++)
-            vertices.Add(new Vertex(cubeVertices[i], cubeNormals[i / 4], cubeUVs[i % 4]));
-        
-        int[] cubeTriangles =
+        int[] indices =
         [
-            0, 2, 1, 0, 3, 2,
-            1, 6, 5, 1, 2, 6,
-            5, 7, 4, 5, 6, 7,
-            4, 3, 0, 4, 7, 3,
-            3, 6, 2, 3, 7, 6,
-            4, 1, 5, 4, 0, 1
+            0, 3, 2, 2, 1, 0, // Back
+            4, 5, 6, 6, 7, 4, // Front
+            0, 4, 7, 7, 3, 0, // Left
+            1, 2, 6, 6, 5, 1, // Right
+            0, 1, 5, 5, 4, 0,  // Bottom
+            3, 7, 6, 6, 2, 3, // Top
         ];
-        triangles.AddRange(cubeTriangles);
+
+        for (var i = 0; i < 6; i++)
+        for (var j = 0; j < 6; j++)
+            vertices.Add(new Vertex(positions[indices[i * 6 + j]], normals[i], uvs[j]));
+
+        triangles.AddRange(Enumerable.Range(0, 36));
 
         return new Mesh(vertices, triangles);
     }
@@ -73,7 +81,7 @@ public class MeshGenerator : IMeshLoader
                 vertices.Add(new Vertex(new Vector3(x, y, z) * radius, new Vector3(x, y, z), new Vector2(j / (float)segments, i / (float)segments)));
             }
         }
-        
+
         for (var i = 0; i < segments; i++)
         {
             for (var j = 0; j < segments; j++)
@@ -106,7 +114,7 @@ public class MeshGenerator : IMeshLoader
                 vertices.Add(new Vertex(new Vector3(x, 0, z), Vector3.UnitY, new Vector2(j / (float)segments, i / (float)segments)));
             }
         }
-        
+
         for (var i = 0; i < segments; i++)
         {
             for (var j = 0; j < segments; j++)

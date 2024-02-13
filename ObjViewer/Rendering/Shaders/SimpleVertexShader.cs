@@ -11,6 +11,7 @@ public sealed class SimpleVertexShader : IVertexShader<Vertex, Vertex>
     {
         position = new Vector4(input.Position, 1.0f);
         position = Vector4.Transform(position, Mvp);
+        var w = 1.0f / position.W;
         position /= position.W;
 
         Vector3 normal = Vector3.TransformNormal(input.Normal, Model);
@@ -22,6 +23,8 @@ public sealed class SimpleVertexShader : IVertexShader<Vertex, Vertex>
         {
             Position = worldPosition,
             Normal = normal,
+            W = w,
+            TextureCoordinates = input.TextureCoordinates * w
         };
     }
 }

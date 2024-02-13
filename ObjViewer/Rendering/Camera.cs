@@ -14,6 +14,6 @@ public class Camera(float fieldOfView, float nearPlane, float farPlane, float as
 
     public Transform Transform { get; set; } = new();
 
-    public Matrix4x4 ViewMatrix => Matrix4x4.CreateLookAt(Transform.Position, Transform.Position + Transform.Forward, Transform.Up);
+    public Matrix4x4 ViewMatrix => Matrix4x4.CreateLookTo(Transform.Position, -Transform.Forward, Transform.Up);
     public Matrix4x4 ProjectionMatrix => Matrix4x4.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
 }

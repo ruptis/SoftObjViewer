@@ -17,7 +17,7 @@ public sealed class BitmapRenderTarget(WriteableBitmap bitmap) : IRenderTarget
     public void DrawPixel(float x, float y, float z, in Color color)
     {
         var index = (int)(y * Width + x);
-        if (_depthBuffer[index] >= z)
+        if (_depthBuffer[index] <= z)
             return;
         
         _depthBuffer[index] = z;
@@ -32,6 +32,6 @@ public sealed class BitmapRenderTarget(WriteableBitmap bitmap) : IRenderTarget
     public void Clear(in Color color)
     {
         Array.Fill(_backBuffer, color.ToArgb());
-        Array.Fill(_depthBuffer, float.MinValue);
+        Array.Fill(_depthBuffer, float.MaxValue);
     }
 }
