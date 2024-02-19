@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using GraphicsPipeline;
 namespace ObjViewer.Rendering.Shaders;
 
@@ -9,13 +10,10 @@ public sealed class SimpleVertexShader : IVertexShader<Vertex, Vertex>
 
     public void ProcessVertex(in Vertex input, out Vertex output, out Vector4 position)
     {
-        position = new Vector4(input.Position, 1.0f);
-        position = Vector4.Transform(position, Mvp);
-        var w = 1.0f / position.W;
-        position /= position.W;
-
-        Vector3 normal = Vector3.TransformNormal(input.Normal, Model);
-        normal = Vector3.Normalize(normal);
+        position = Vector4.Transform(new Vector4(input.Position, 1.0f), Mvp);
+        
+        Debug.Assert(input.Normal != Vector3.Zero, "Normal is zero");
+        Vector3 normal = Vector3.Normalize(Vector3.TransformNormal(input.Normal, Model));
 
         Vector3 worldPosition = Vector3.Transform(input.Position, Model);
 
@@ -23,8 +21,6 @@ public sealed class SimpleVertexShader : IVertexShader<Vertex, Vertex>
         {
             Position = worldPosition,
             Normal = normal,
-            W = w,
-            TextureCoordinates = input.TextureCoordinates * w
         };
     }
 }

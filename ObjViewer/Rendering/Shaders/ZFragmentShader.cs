@@ -5,9 +5,9 @@ namespace ObjViewer.Rendering.Shaders;
 
 public sealed class ZFragmentShader : IFragmentShader<Vertex>
 {
-    public void ProcessFragment(in Vector3 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
     {
-        var colorComponent = (byte)(fragCoord.Z * 255);
+        var colorComponent = (byte)(fragCoord.W * 255);
         color = Color.FromArgb(colorComponent, colorComponent, colorComponent);
     }
 }

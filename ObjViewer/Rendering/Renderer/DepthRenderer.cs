@@ -2,4 +2,4 @@
 using ObjViewer.Rendering.Shaders;
 namespace ObjViewer.Rendering.Renderer;
 
-public sealed class NormalRenderer : SimpleRenderer<NormalFragmentShader, ScanlineTriangleRasterizer>;
+public class DepthRenderer : SimpleRenderer<ZFragmentShader, ScanlineTriangleRasterizer>;

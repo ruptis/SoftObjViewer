@@ -65,8 +65,10 @@ public class ObjParser : IMeshLoader
             vertices.Add(vertex);
         }
 
-        _vertexIndices = [..Enumerable.Range(0, vertices.Count)];
-        return new Mesh(vertices, _vertexIndices);
+        var uniqueVertices = vertices.Distinct().ToList();
+        var uniqueIndices = vertices.Select(v => uniqueVertices.IndexOf(v)).ToList();
+        
+        return new Mesh(uniqueVertices, uniqueIndices);
     }
 
     private void ParseVertices(string[] s)

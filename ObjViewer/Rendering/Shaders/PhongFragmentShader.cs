@@ -15,7 +15,7 @@ public sealed class PhongFragmentShader : IFragmentShader<Vertex>
     public Vector3 ViewPosition { get; set; }
     public Vector3 LightPosition { get; set; }
 
-    public void ProcessFragment(in Vector3 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
     {
         Vector3 lightDirection = Vector3.Normalize(LightPosition - input.Position);
         Vector3 viewDirection = Vector3.Normalize(ViewPosition - input.Position);

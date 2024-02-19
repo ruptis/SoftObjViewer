@@ -2,4 +2,4 @@
 using ObjViewer.Rendering.Shaders;
 namespace ObjViewer.Rendering.Renderer;
 
-public sealed class UvRenderer : SimpleRenderer<UvFragmentShader, TriangleRasterizer>;
+public sealed class UvRenderer : SimpleRenderer<UvFragmentShader, ScanlineTriangleRasterizer>;

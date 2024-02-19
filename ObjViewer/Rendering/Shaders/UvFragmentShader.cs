@@ -9,11 +9,10 @@ public sealed class UvFragmentShader : IFragmentShader<Vertex>
     private const int Height = 256;
     private readonly Color[] _texture = CreateTestTexture();
     
-    public void ProcessFragment(in Vector3 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
     {
-        Vector2 textureCoordinates = input.TextureCoordinates / input.W;
-        var x = (int)(textureCoordinates.X * Width) % Width;
-        var y = (int)(textureCoordinates.Y * Height) % Height;
+        var x = (int)(input.TextureCoordinates.X * Width) % Width;
+        var y = (int)(input.TextureCoordinates.Y * Height) % Height;
         color = _texture[y * Width + x];
     }
     

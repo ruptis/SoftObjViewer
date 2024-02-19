@@ -4,5 +4,5 @@ namespace GraphicsPipeline;
 
 public interface IFragmentShader<TIn> where TIn : struct
 {
-    public void ProcessFragment(in Vector3 fragCoord, in TIn input, out Color color);
+    public void ProcessFragment(in Vector4 fragCoord, in TIn input, out Color color);
 }

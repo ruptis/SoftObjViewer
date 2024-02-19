@@ -5,7 +5,7 @@ namespace ObjViewer.Rendering.Shaders;
 
 public sealed class NormalFragmentShader : IFragmentShader<Vertex>
 {
-    public void ProcessFragment(in Vector3 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
     {
         Vector3 normal = Vector3.Normalize(input.Normal);
         color = Color.FromArgb(

@@ -67,11 +67,11 @@ public partial class MainWindow
     {
         _model = new Model
         {
-            Mesh = await MeshLoader.LoadMeshAsync("ModelSamples/cube.obj"),
+            Mesh = await MeshLoader.LoadMeshAsync("ModelSamples/chick.obj"),
             Transform = new Transform
             {
-                Position = Vector3.Zero,
-                Scale = new Vector3(1f)
+                Position = new Vector3(0f, -7f, 0f),
+                Scale = new Vector3(0.2f)
             }
         };
     }

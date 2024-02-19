@@ -18,7 +18,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
             new("Lambert", new LambertRenderer()),
             new("Phong", new PhongRenderer()),
             new("Normal", new NormalRenderer()),
-            new("UV", new UvRenderer())
+            new("UV", new UvRenderer()),
+            new("Depth", new DepthRenderer()),
         };
         _selectedRenderMode = RenderModes[0];
     }

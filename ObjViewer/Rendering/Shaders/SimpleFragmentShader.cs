@@ -5,7 +5,7 @@ namespace ObjViewer.Rendering.Shaders;
 
 public class SimpleFragmentShader : IFragmentShader<Vertex>
 {
-    public void ProcessFragment(in Vector3 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
     {
         color = Color.Orange;
     }
