@@ -15,20 +15,33 @@ public sealed class PhongFragmentShader : IFragmentShader<Vertex>
     public Vector3 ViewPosition { get; set; }
     public Vector3 LightPosition { get; set; }
 
+    public bool Blinn { get; set; }
+
     public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
     {
         Vector3 lightDirection = Vector3.Normalize(LightPosition - input.Position);
         Vector3 viewDirection = Vector3.Normalize(ViewPosition - input.Position);
         Vector3 normal = Vector3.Normalize(input.Normal);
 
+        var lambertian = Vector3.Dot(normal, lightDirection);
+
         Vector3 ambientComponent = Ambient * AmbientColor;
-        Vector3 diffuseComponent = Diffuse * LightColor * Math.Max(Vector3.Dot(normal, lightDirection), 0.0f);
+        Vector3 diffuseComponent = Diffuse * LightColor * Math.Max(lambertian, 0.0f);
         Vector3 specularComponent = Vector3.Zero;
 
-        if (Vector3.Dot(normal, lightDirection) > 0.0f)
+        if (lambertian > 0.0f)
         {
-            Vector3 halfVector = Vector3.Normalize(lightDirection + viewDirection);
-            var specularAngle = Math.Max(Vector3.Dot(normal, halfVector), 0.0f);
+            float specularAngle;
+            if (Blinn)
+            {
+                Vector3 halfVector = Vector3.Normalize(lightDirection + viewDirection);
+                specularAngle = Math.Max(Vector3.Dot(normal, halfVector), 0.0f);
+            }
+            else
+            {
+                Vector3 reflectDirection = Vector3.Reflect(-lightDirection, normal);
+                specularAngle = Math.Max(Vector3.Dot(reflectDirection, viewDirection), 0.0f);
+            }
             specularComponent = Specular * LightColor * MathF.Pow(specularAngle, Shininess);
         }
 

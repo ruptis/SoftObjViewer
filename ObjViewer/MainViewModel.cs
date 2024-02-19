@@ -17,6 +17,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             new("Flat Lambert", new FlatLambertRenderer()),
             new("Lambert", new LambertRenderer()),
             new("Phong", new PhongRenderer()),
+            new("Blinn-Phong", new BlinnPhongRenderer()),   
             new("Normal", new NormalRenderer()),
             new("UV", new UvRenderer()),
             new("Depth", new DepthRenderer()),
