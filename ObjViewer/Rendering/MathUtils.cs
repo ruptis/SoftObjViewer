@@ -11,4 +11,10 @@ public static class MathUtils
     public static float Clamp01(float value) => MathF.Max(0f, MathF.Min(1f, value));
     public static Vector2 PerspectiveCorrectLerp(Vector2 min, Vector2 max, float zMin, float zMax, float amount) =>
         Vector2.Lerp(min / zMin, max / zMax, amount) / float.Lerp(1f / zMin, 1f / zMax, amount);
+
+    public static Vector3 Pow(in Vector3 value, float power) => new(
+        MathF.Pow(value.X, power),
+        MathF.Pow(value.Y, power),
+        MathF.Pow(value.Z, power)
+    );
 }

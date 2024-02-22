@@ -2,15 +2,16 @@
 using GraphicsPipeline;
 namespace ObjViewer.Rendering.Renderer;
 
-public abstract class ModelRenderer<TV, TF, TR> : IModelRenderer
-    where TV : IVertexShader<Vertex, Vertex>, new()
-    where TF : IFragmentShader<Vertex>, new()
-    where TR : IRasterizer<Vertex>, new()
+public abstract class ModelRenderer<TFIn, TV, TF, TR> : IModelRenderer
+    where TFIn : struct
+    where TV : IVertexShader<Vertex, TFIn>, new()
+    where TF : IFragmentShader<TFIn>, new()
+    where TR : IRasterizer<TFIn>, new()
 {
-    private readonly GraphicsPipeline<Vertex, Vertex> _graphicsPipeline;
+    private readonly GraphicsPipeline<Vertex, TFIn> _graphicsPipeline;
 
     protected ModelRenderer() => 
-        _graphicsPipeline = new GraphicsPipeline<Vertex, Vertex>(VertexShader, FragmentShader, Rasterizer);
+        _graphicsPipeline = new GraphicsPipeline<Vertex, TFIn>(VertexShader, FragmentShader, Rasterizer);
 
     protected TV VertexShader { get; } = new();
     protected TF FragmentShader { get; } = new();

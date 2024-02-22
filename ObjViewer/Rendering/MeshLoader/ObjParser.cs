@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-
 namespace ObjViewer.Rendering.MeshLoader;
 
 public class ObjParser : IMeshLoader
@@ -43,32 +40,54 @@ public class ObjParser : IMeshLoader
         var lines = text.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         foreach (var line in lines)
         {
-            var tokens = line.Split(" ");
-            if (_parsers.TryGetValue(tokens[0], out Action<string[]> parseAction))
+            var tokens = line.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (_parsers.TryGetValue(tokens[0], out var parseAction))
             {
                 parseAction(tokens);
             }
         }
-
-        var vertices = new List<Vertex>();
-        foreach (var face in _faces)
+        
+        var tangents = new Vector3[_vertices.Count];
+        for (var i = 0; i < _faces.Count; i += 3)
         {
-            /*_vertexIndices.Add(face.VertexIndex > 0 ? face.VertexIndex - 1 : 0);*/
+            Vector3 tangent = CalculateTangent(_faces[i], _faces[i + 1], _faces[i + 2]);
+            tangents[_faces[i].VertexIndex - 1] += tangent;
+            tangents[_faces[i + 1].VertexIndex - 1] += tangent;
+            tangents[_faces[i + 2].VertexIndex - 1] += tangent;
+        }
+        
+        var vertices = new List<Vertex>();
+        foreach (Face face in _faces)
+        {
             var vertex = new Vertex
             {
                 Normal = face.NormalIndex > 0 ? _normals[face.NormalIndex - 1] : Vector3.Zero,
                 Position = face.VertexIndex > 0 ? _vertices[face.VertexIndex - 1] : Vector3.Zero,
                 TextureCoordinates = face.TextureCoordsIndex > 0
                     ? _textureCoords[face.TextureCoordsIndex - 1]
-                    : Vector2.Zero
+                    : Vector2.Zero,
+                Tangent = tangents[face.VertexIndex - 1]
             };
             vertices.Add(vertex);
         }
-
+        
         var uniqueVertices = vertices.Distinct().ToList();
         var uniqueIndices = vertices.Select(v => uniqueVertices.IndexOf(v)).ToList();
-        
+
         return new Mesh(uniqueVertices, uniqueIndices);
+    }
+    
+    private Vector3 CalculateTangent(Face f0, Face f1, Face f2)
+    {
+        Vector3 edge1 = _vertices[f1.VertexIndex - 1] - _vertices[f0.VertexIndex - 1];
+        Vector3 edge2 = _vertices[f2.VertexIndex - 1] - _vertices[f0.VertexIndex - 1];
+        Vector2 deltaUv1 = _textureCoords[f1.TextureCoordsIndex - 1] - _textureCoords[f0.TextureCoordsIndex - 1];
+        Vector2 deltaUv2 = _textureCoords[f2.TextureCoordsIndex - 1] - _textureCoords[f0.TextureCoordsIndex - 1];
+
+        var f = 1.0f / (deltaUv1.X * deltaUv2.Y - deltaUv2.X * deltaUv1.Y);
+        Vector3 tangent = (edge1 * deltaUv2.Y - edge2 * deltaUv1.Y) * f;
+
+        return tangent;
     }
 
     private void ParseVertices(string[] s)

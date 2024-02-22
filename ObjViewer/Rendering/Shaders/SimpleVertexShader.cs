@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using GraphicsPipeline;
 namespace ObjViewer.Rendering.Shaders;
 
@@ -12,7 +11,6 @@ public sealed class SimpleVertexShader : IVertexShader<Vertex, Vertex>
     {
         position = Vector4.Transform(new Vector4(input.Position, 1.0f), Mvp);
         
-        Debug.Assert(input.Normal != Vector3.Zero, "Normal is zero");
         Vector3 normal = Vector3.Normalize(Vector3.TransformNormal(input.Normal, Model));
 
         Vector3 worldPosition = Vector3.Transform(input.Position, Model);

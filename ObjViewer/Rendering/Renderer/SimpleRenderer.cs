@@ -2,7 +2,7 @@
 using ObjViewer.Rendering.Shaders;
 namespace ObjViewer.Rendering.Renderer;
 
-public class SimpleRenderer<TF, TR> : ModelRenderer<SimpleVertexShader, TF, TR>
+public class SimpleRenderer<TF, TR> : ModelRenderer<Vertex, SimpleVertexShader, TF, TR>
     where TF : IFragmentShader<Vertex>, new() 
     where TR : IRasterizer<Vertex>, new()
 {

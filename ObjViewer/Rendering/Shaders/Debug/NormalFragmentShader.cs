@@ -5,13 +5,16 @@ namespace ObjViewer.Rendering.Shaders;
 
 public sealed class NormalFragmentShader : IFragmentShader<Vertex>
 {
+    public Texture? NormalTexture { get; set; }
+    
     public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
     {
-        Vector3 normal = Vector3.Normalize(input.Normal);
+        Vector3 normal = NormalTexture?.SampleNormal(input.TextureCoordinates) ?? input.Normal;
+        
         color = Color.FromArgb(
-            (int) (normal.X * 127 + 128),
-            (int) (normal.Y * 127 + 128),
-            (int) (normal.Z * 127 + 128)
+            (byte) (normal.X * 127 + 128),
+            (byte) (normal.Y * 127 + 128),
+            (byte) (normal.Z * 127 + 128)
         );
     }
 }

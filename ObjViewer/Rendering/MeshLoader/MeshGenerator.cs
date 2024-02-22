@@ -57,7 +57,12 @@ public class MeshGenerator : IMeshLoader
 
         for (var i = 0; i < 6; i++)
         for (var j = 0; j < 6; j++)
-            vertices.Add(new Vertex(positions[indices[i * 6 + j]], normals[i], uvs[j]));
+            vertices.Add(new Vertex()
+            {
+                Position = positions[indices[i * 6 + j]],
+                Normal = normals[i],
+                TextureCoordinates = uvs[j]
+            });
 
         triangles.AddRange(Enumerable.Range(0, 36));
 
@@ -78,7 +83,12 @@ public class MeshGenerator : IMeshLoader
                 var x = MathF.Cos(theta) * MathF.Sin(phi);
                 var y = MathF.Cos(phi);
                 var z = MathF.Sin(theta) * MathF.Sin(phi);
-                vertices.Add(new Vertex(new Vector3(x, y, z) * radius, new Vector3(x, y, z), new Vector2(j / (float)segments, i / (float)segments)));
+                vertices.Add(new Vertex()
+                {
+                    Position = new Vector3(x, y, z) * radius, 
+                    Normal = new Vector3(x, y, z), 
+                    TextureCoordinates = new Vector2(j / (float)segments, i / (float)segments)
+                });
             }
         }
 
@@ -111,7 +121,12 @@ public class MeshGenerator : IMeshLoader
             {
                 var x = (j / (float)segments - 0.5f) * size;
                 var z = (i / (float)segments - 0.5f) * size;
-                vertices.Add(new Vertex(new Vector3(x, 0, z), Vector3.UnitY, new Vector2(j / (float)segments, i / (float)segments)));
+                vertices.Add(new Vertex()
+                {
+                    Position = new Vector3(x, 0, z), 
+                    Normal = Vector3.UnitY, 
+                    TextureCoordinates = new Vector2(j / (float)segments, i / (float)segments)
+                });
             }
         }
 

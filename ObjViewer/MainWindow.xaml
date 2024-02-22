@@ -22,7 +22,6 @@
                HorizontalAlignment="Stretch"
                VerticalAlignment="Stretch"
                Stretch="UniformToFill" />
-        <!--make stylised combobox (orange text, bold, large font)-->
         <ComboBox Grid.Column="1" ItemsSource="{Binding RenderModes}"
                   SelectedItem="{Binding SelectedRenderMode}"
                   DisplayMemberPath="Name"
@@ -34,7 +33,6 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="FPS: " Margin="0,0,5,0" />
                 <TextBlock Text="{Binding Fps, StringFormat={}{0:N2}}" />
-                <TextBlock Text=" ms" Margin="5,0,0,0" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Frame Time: " Margin="0,0,5,0" />

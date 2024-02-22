@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Input;
@@ -9,6 +8,7 @@ using System.Windows.Media.Imaging;
 using ObjViewer.Rendering;
 using ObjViewer.Rendering.MeshLoader;
 using ObjViewer.Rendering.Renderer;
+using ObjViewer.Rendering.TextureLoader;
 using Camera = ObjViewer.Rendering.Camera;
 using Transform = ObjViewer.Rendering.Transform;
 namespace ObjViewer;
@@ -21,7 +21,8 @@ public partial class MainWindow
     private readonly MainViewModel _viewModel = new();
 
     private IModelRenderer Renderer => _viewModel.SelectedRenderMode.Renderer;
-    private IMeshLoader MeshLoader => new ObjParser();
+    private readonly IMeshLoader _meshLoader = new ObjParser();
+    private readonly ITextureLoader _textureLoader = new PngTextureLoader();
 
     private Model _model = new();
     
@@ -67,11 +68,15 @@ public partial class MainWindow
     {
         _model = new Model
         {
-            Mesh = await MeshLoader.LoadMeshAsync("ModelSamples/chick.obj"),
+            Mesh = await _meshLoader.LoadMeshAsync("ModelSamples/chest2.obj"),
+            DiffuseMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_basecolor.png"),
+            NormalMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_normal.png"),
+            SpecularMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_f0.png"),
             Transform = new Transform
             {
-                Position = new Vector3(0f, -7f, 0f),
-                Scale = new Vector3(0.2f)
+                Position = new Vector3(0f, -1f, 0f),
+                Rotation = Quaternion.CreateFromYawPitchRoll(0, -MathF.PI / 2, 0),
+                Scale = new Vector3(2f)
             }
         };
     }
