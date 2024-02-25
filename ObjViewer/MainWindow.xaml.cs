@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ObjViewer.MeshLoader;
 using ObjViewer.Rendering;
-using ObjViewer.Rendering.MeshLoader;
 using ObjViewer.Rendering.Renderer;
 using ObjViewer.Rendering.TextureLoader;
 using Camera = ObjViewer.Rendering.Camera;
@@ -25,7 +26,7 @@ public partial class MainWindow
     private readonly ITextureLoader _textureLoader = new PngTextureLoader();
 
     private Model _model = new();
-    
+
     private readonly Camera _camera;
     private readonly BitmapRenderTarget _renderTarget;
 
@@ -36,10 +37,12 @@ public partial class MainWindow
     private Vector2 _previousMousePosition;
     private bool _isDragging;
 
+    private readonly Action _presentAction;
+
     public MainWindow()
     {
         InitializeComponent();
-        
+
         var bitmap = new WriteableBitmap(
             (int)Width,
             (int)Height,
@@ -53,15 +56,21 @@ public partial class MainWindow
         _camera = new Camera(_renderTarget.Width / (float)_renderTarget.Height);
         _camera.Transform.Position = new Vector3(0, 2, 8);
         _camera.Transform.LookAt(Vector3.Zero, Vector3.UnitY);
-        
+
         Loaded += OnLoaded;
 
         DataContext = _viewModel;
-        
+
         _uiUpdateTimer.Start();
         _frameTimer.Start();
+        
+        _presentAction = () => _renderTarget.Present();
 
-        CompositionTarget.Rendering += OnRendering;
+        Task.Run(() =>
+        {
+            while (true)
+                OnRendering();
+        });
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -69,25 +78,26 @@ public partial class MainWindow
         _model = new Model
         {
             Mesh = await _meshLoader.LoadMeshAsync("ModelSamples/chest2.obj"),
-            DiffuseMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_basecolor.png"),
-            NormalMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_normal.png"),
-            SpecularMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_f0.png"),
+            DiffuseMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/chest_diffuse2.png"),
+            NormalMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_normal.png", true),
+            SpecularMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/chest_specular3.png"),
             Transform = new Transform
             {
-                Position = new Vector3(0f, -1f, 0f),
+                Position = new Vector3(0f, -2f, 0f),
                 Rotation = Quaternion.CreateFromYawPitchRoll(0, -MathF.PI / 2, 0),
                 Scale = new Vector3(2f)
             }
         };
     }
 
-    private void OnRendering(object? sender, EventArgs e)
+    private void OnRendering()
     {
         var frameTime = _frameTimer.Elapsed.TotalMilliseconds;
         _frameTimer.Restart();
-        
+
         _drawTimer.Restart();
         Renderer.DrawModel(_model, _camera, _renderTarget);
+        Dispatcher.Invoke(_presentAction);
         _drawTimer.Stop();
 
         UpdateInfo(_drawTimer.Elapsed.TotalMilliseconds, frameTime);

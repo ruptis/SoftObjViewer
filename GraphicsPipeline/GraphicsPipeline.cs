@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Runtime.Intrinsics;
 namespace GraphicsPipeline;
 
-public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : struct where TFIn : struct
+public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TFIn : unmanaged
 {
     private readonly IVertexShader<TVIn, TFIn> _vertexShader;
     private readonly IFragmentShader<TFIn> _fragmentShader;

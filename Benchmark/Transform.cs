@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-namespace ObjViewer.Rendering;
+namespace Benchmark;
 
 public sealed class Transform(Vector3 scale, Quaternion rotation, Vector3 position)
 {

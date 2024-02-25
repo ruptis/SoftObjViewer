@@ -1,5 +1,5 @@
 ﻿using GraphicsPipeline.Components;
-namespace ObjViewer.Rendering;
+namespace Benchmark;
 
 public readonly record struct Model(
     Mesh Mesh, 

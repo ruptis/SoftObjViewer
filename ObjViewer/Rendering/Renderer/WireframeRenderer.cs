@@ -1,11 +1,11 @@
 ﻿using GraphicsPipeline;
-using ObjViewer.Rendering.Rasterization;
-using ObjViewer.Rendering.Shaders;
+using GraphicsPipeline.Components.Rasterization;
+using GraphicsPipeline.Components.Shaders;
 namespace ObjViewer.Rendering.Renderer;
 
 public sealed class WireframeRenderer : SimpleRenderer<SimpleFragmentShader, BresenhamRasterizer>
 {
-    protected override void OnDraw(in Model model, in Camera camera, in IRenderTarget renderTarget)
+    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
     {
         base.OnDraw(model, camera, renderTarget);
         BackfaceCulling = false;

@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using GraphicsPipeline.Components;
-namespace ObjViewer.Rendering;
+﻿using GraphicsPipeline.Components;
+namespace Benchmark;
 
 public readonly record struct Mesh(IReadOnlyList<Vertex> Vertices, IReadOnlyList<int> Indices)
 {

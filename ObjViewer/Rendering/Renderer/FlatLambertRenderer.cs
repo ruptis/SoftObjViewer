@@ -1,14 +1,15 @@
 ﻿using System.Numerics;
 using GraphicsPipeline;
-using ObjViewer.Rendering.Rasterization;
-using ObjViewer.Rendering.Rasterization.Interpolation;
-using ObjViewer.Rendering.Shaders;
+using GraphicsPipeline.Components;
+using GraphicsPipeline.Components.Rasterization;
+using GraphicsPipeline.Components.Rasterization.Interpolation;
+using GraphicsPipeline.Components.Shaders;
 namespace ObjViewer.Rendering.Renderer;
 
-public sealed class FlatLambertRenderer : SimpleRenderer<LambertFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexInterpolator>>
+public sealed class FlatLambertRenderer : SimpleRenderer<LambertFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexScanlineInterpolator>>
 {
-    private static readonly Vector3 LightPosition = new(0, 2, 8);
-    protected override void OnDraw(in Model model, in Camera camera, in IRenderTarget renderTarget)
+    private static readonly Vector3 LightPosition = new(0, 8, 8);
+    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
     {
         base.OnDraw(model, camera, renderTarget);
 

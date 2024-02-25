@@ -1,21 +1,22 @@
 ﻿using System.Numerics;
 using GraphicsPipeline;
-using ObjViewer.Rendering.Rasterization;
-using ObjViewer.Rendering.Rasterization.Interpolation;
-using ObjViewer.Rendering.Shaders.Phong;
+using GraphicsPipeline.Components;
+using GraphicsPipeline.Components.Rasterization;
+using GraphicsPipeline.Components.Rasterization.Interpolation;
+using GraphicsPipeline.Components.Shaders.Phong;
 namespace ObjViewer.Rendering.Renderer;
 
-public class TexturedPhongRenderer : ModelRenderer<PhongShaderData, PhongVertexShader, TexturedPhongFragmentShader, ScanlineTriangleRasterizer<PhongShaderData, PhongDataInterpolator>>
+public class TexturedPhongRenderer : ModelRenderer<PhongShaderInput, PhongVertexShader, TexturedPhongFragmentShader, HalfspaceTriangleRasterizer<PhongShaderInput, PhongHalfspaceInterpolator>>
 {
-    private static readonly Vector3 LightPosition = new(0, 2, 8);
+    private static readonly Vector3 LightPosition = new(0, 8, 8);
     
-    protected override void OnDraw(in Model model, in Camera camera, in IRenderTarget renderTarget)
+    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
     {
-        VertexShader.LightPosition = LightPosition;
-        VertexShader.ViewPosition = camera.Transform.Position;
+        VertexShader.Model = model.Transform.WorldMatrix;
+        VertexShader.Mvp = model.Transform.WorldMatrix * camera.ViewMatrix * camera.ProjectionMatrix;
         
-        VertexShader.ModelView = model.Transform.WorldMatrix * camera.ViewMatrix;
-        VertexShader.Mvp = VertexShader.ModelView * camera.ProjectionMatrix;
+        FragmentShader.ViewPosition = camera.Transform.Position;
+        FragmentShader.LightPosition = LightPosition;
 
         FragmentShader.NormalMap = model.NormalMap ?? Texture.Checkerboard512;
         FragmentShader.DiffuseMap = model.DiffuseMap ?? Texture.Checkerboard512;
@@ -25,7 +26,7 @@ public class TexturedPhongRenderer : ModelRenderer<PhongShaderData, PhongVertexS
 
 public sealed class TexturedBlinnPhongRenderer : TexturedPhongRenderer
 {
-    protected override void OnDraw(in Model model, in Camera camera, in IRenderTarget renderTarget)
+    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
     {
         base.OnDraw(model, camera, renderTarget);
         FragmentShader.Blinn = true;

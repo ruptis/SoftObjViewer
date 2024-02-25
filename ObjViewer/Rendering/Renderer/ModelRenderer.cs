@@ -1,9 +1,11 @@
 ﻿using System.Drawing;
+using System.Windows.Threading;
 using GraphicsPipeline;
+using GraphicsPipeline.Components;
 namespace ObjViewer.Rendering.Renderer;
 
 public abstract class ModelRenderer<TFIn, TV, TF, TR> : IModelRenderer
-    where TFIn : struct
+    where TFIn : unmanaged
     where TV : IVertexShader<Vertex, TFIn>, new()
     where TF : IFragmentShader<TFIn>, new()
     where TR : IRasterizer<TFIn>, new()
@@ -25,13 +27,12 @@ public abstract class ModelRenderer<TFIn, TV, TF, TR> : IModelRenderer
 
     public Color ClearColor { get; set; } = Color.SlateGray;
 
-    public void DrawModel(in Model model, in Camera camera, in IRenderTarget renderTarget)
+    public void DrawModel(in Model model, in Camera camera, IRenderTarget renderTarget)
     {
         OnDraw(model, camera, renderTarget);
         renderTarget.Clear(ClearColor);
         _graphicsPipeline.Render(model.Mesh.Vertices, model.Mesh.Indices, renderTarget);
-        renderTarget.Present();
     }
 
-    protected abstract void OnDraw(in Model model, in Camera camera, in IRenderTarget renderTarget);
+    protected abstract void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget);
 }
