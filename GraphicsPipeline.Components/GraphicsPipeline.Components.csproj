@@ -11,10 +11,4 @@
         <ProjectReference Include="..\Utils\Utils.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Reference Include="GraphicsPipeline.Components">
-            <HintPath>..\Benchmark\bin\Debug\net8.0\GraphicsPipeline.Components.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-
 </Project>
