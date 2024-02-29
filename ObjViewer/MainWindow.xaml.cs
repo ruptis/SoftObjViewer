@@ -6,12 +6,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ObjViewer.MeshLoader;
 using ObjViewer.Rendering;
 using ObjViewer.Rendering.Renderer;
-using ObjViewer.Rendering.TextureLoader;
-using Camera = ObjViewer.Rendering.Camera;
-using Transform = ObjViewer.Rendering.Transform;
+using Utils;
+using Utils.MeshLoader;
+using Utils.TextureLoader;
+using Color = System.Drawing.Color;
+using Transform = Utils.Transform;
 namespace ObjViewer;
 
 /// <summary>
@@ -63,7 +64,7 @@ public partial class MainWindow
 
         _uiUpdateTimer.Start();
         _frameTimer.Start();
-        
+
         _presentAction = () => _renderTarget.Present();
 
         Task.Run(() =>
@@ -96,6 +97,7 @@ public partial class MainWindow
         _frameTimer.Restart();
 
         _drawTimer.Restart();
+        _renderTarget.Clear(Color.SlateGray);
         Renderer.DrawModel(_model, _camera, _renderTarget);
         Dispatcher.Invoke(_presentAction);
         _drawTimer.Stop();

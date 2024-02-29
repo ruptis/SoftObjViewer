@@ -1,14 +1,13 @@
-﻿using GraphicsPipeline.Components;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-namespace Benchmark;
+namespace Utils.TextureLoader;
 
-public class PngTextureLoader
+public class PngTextureLoader : ITextureLoader
 {
     public async Task<Texture> LoadTextureAsync(string path, bool flipY = false)
     {
         await using FileStream file = File.OpenRead(path);
-        
+
         var image = await Image.LoadAsync<Rgba32>(file);
         var data = new byte[image.Width * image.Height * 3];
         for (var y = 0; y < image.Height; y++)

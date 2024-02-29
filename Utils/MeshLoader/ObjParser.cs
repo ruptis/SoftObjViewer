@@ -1,14 +1,7 @@
-﻿using GraphicsPipeline.Components;
-namespace Benchmark;
+﻿using System.Numerics;
+namespace Utils.MeshLoader;
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
-
-public class ObjParser
+public class ObjParser : IMeshLoader
 {
     private struct Face
     {
@@ -154,4 +147,3 @@ public class ObjParser
         }
     }
 }
-

@@ -17,7 +17,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             new("Flat Lambert", new FlatLambertRenderer()),
             new("Lambert", new LambertRenderer()),
             new("Phong", new PhongRenderer()),
-            new("Blinn-Phong", new BlinnPhongRenderer()), 
+            new("Blinn-Phong", new BlinnPhongRenderer()),
             new("Textured Phong", new TexturedPhongRenderer()),
             new("Textured Blinn-Phong", new TexturedBlinnPhongRenderer()),
             new("Normal", new NormalRenderer()),
@@ -26,7 +26,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         };
         _selectedRenderMode = RenderModes[0];
     }
-    
+
     public ObservableCollection<RenderMode> RenderModes { get; }
 
     private RenderMode _selectedRenderMode;
@@ -37,12 +37,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             if (_selectedRenderMode == value)
                 return;
-            
+
             _selectedRenderMode = value;
             OnPropertyChanged();
         }
     }
-    
+
     private double _frameTime;
     public double FrameTime
     {
@@ -51,12 +51,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             if (IsEqual(_frameTime, value))
                 return;
-            
+
             _frameTime = value;
             OnPropertyChanged();
         }
     }
-    
+
     private double _drawTime;
     public double DrawTime
     {
@@ -65,12 +65,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             if (IsEqual(_drawTime, value))
                 return;
-            
+
             _drawTime = value;
             OnPropertyChanged();
         }
     }
-    
+
     private double _fps;
     public double Fps
     {
@@ -79,12 +79,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             if (IsEqual(_fps, value))
                 return;
-            
+
             _fps = value;
             OnPropertyChanged();
         }
     }
-    
+
     private int _vertexCount;
     public int VertexCount
     {
@@ -93,12 +93,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             if (_vertexCount == value)
                 return;
-            
+
             _vertexCount = value;
             OnPropertyChanged();
         }
     }
-    
+
     private int _triangleCount;
     public int TriangleCount
     {
@@ -107,7 +107,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             if (_triangleCount == value)
                 return;
-            
+
             _triangleCount = value;
             OnPropertyChanged();
         }
@@ -118,6 +118,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
+
     private static bool IsEqual(double a, double b) => Math.Abs(a - b) < double.Epsilon;
 }

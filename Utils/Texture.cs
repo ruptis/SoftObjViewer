@@ -1,11 +1,11 @@
 ﻿using System.Numerics;
-namespace GraphicsPipeline.Components;
+namespace Utils;
 
 public readonly struct Texture(int width, int height, byte[] data)
 {
     public static Texture Checkerboard256 { get; } = new(256, 256, CreateCheckerboard(256));
     public static Texture Checkerboard512 { get; } = new(512, 512, CreateCheckerboard(512));
-    
+
     private int Width { get; } = width;
     private int Height { get; } = height;
     private byte[] Data { get; } = data;
@@ -15,13 +15,13 @@ public readonly struct Texture(int width, int height, byte[] data)
         var index = GetSampleIndex(uv);
         return new Vector3(Data[index], Data[index + 1], Data[index + 2]) / 255.0f;
     }
-    
+
     public Vector3 SampleNormal(in Vector2 uv)
     {
         var index = GetSampleIndex(uv);
         return new Vector3(Data[index], Data[index + 1], Data[index + 2]) / 127.5f - Vector3.One;
     }
-    
+
     private int GetSampleIndex(in Vector2 uv)
     {
         var x = (int)(uv.X * Width) % Width;

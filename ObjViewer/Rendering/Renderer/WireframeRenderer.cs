@@ -1,6 +1,7 @@
 ﻿using GraphicsPipeline;
 using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders;
+using Utils;
 namespace ObjViewer.Rendering.Renderer;
 
 public sealed class WireframeRenderer : SimpleRenderer<SimpleFragmentShader, BresenhamRasterizer>

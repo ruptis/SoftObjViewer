@@ -1,9 +1,8 @@
-﻿using System.Drawing;
-using GraphicsPipeline;
+﻿using GraphicsPipeline;
+using Utils;
 namespace ObjViewer.Rendering.Renderer;
 
 public interface IModelRenderer
 {
-    Color ClearColor { get; set; }
     void DrawModel(in Model model, in Camera camera, IRenderTarget renderTarget);
 }

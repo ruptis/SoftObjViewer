@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using GraphicsPipeline.Components.Rasterization.Interpolation;
+using GraphicsPipeline.Components.Interpolation;
 namespace GraphicsPipeline.Components.Rasterization;
 
 public sealed class HalfspaceTriangleRasterizer<T, TInterpolator> : IRasterizer<T>
@@ -14,7 +14,7 @@ public sealed class HalfspaceTriangleRasterizer<T, TInterpolator> : IRasterizer<
         var minY = (int)MathF.Min(triangle.A.Y, MathF.Min(triangle.B.Y, triangle.C.Y));
         var maxX = (int)MathF.Max(triangle.A.X, MathF.Max(triangle.B.X, triangle.C.X));
         var maxY = (int)MathF.Max(triangle.A.Y, MathF.Max(triangle.B.Y, triangle.C.Y));
-        
+
         Vector3 i = new(
             triangle.C.Y - triangle.B.Y,
             triangle.A.Y - triangle.C.Y,
@@ -27,9 +27,9 @@ public sealed class HalfspaceTriangleRasterizer<T, TInterpolator> : IRasterizer<
             triangle.B.Y * triangle.C.X - triangle.B.X * triangle.C.Y,
             triangle.C.Y * triangle.A.X - triangle.C.X * triangle.A.Y,
             triangle.A.Y * triangle.B.X - triangle.A.X * triangle.B.Y);
-        
+
         var area = TriangleArea(in triangle);
-        
+
         Vector3 wY = i * minX - j * minY + k;
 
         for (var y = minY; y <= maxY; y++, wY -= j)
@@ -39,8 +39,9 @@ public sealed class HalfspaceTriangleRasterizer<T, TInterpolator> : IRasterizer<
             {
                 if (wX is not { X: >= 0, Y: >= 0, Z: >= 0 })
                     continue;
-                
+
                 Vector3 barycentric = wX / area;
+                barycentric /= barycentric.X + barycentric.Y + barycentric.Z;
                 var z = InterpolateZ(in triangle, in barycentric);
                 var w = InterpolateW(in triangle, in barycentric);
                 T interpolated = _interpolator.Interpolate(in triangle, in barycentric);
@@ -52,7 +53,7 @@ public sealed class HalfspaceTriangleRasterizer<T, TInterpolator> : IRasterizer<
             }
         }
     }
-    
+
     private static float TriangleArea(in Triangle<T> triangle) =>
         (triangle.C.X - triangle.A.X) * (triangle.B.Y - triangle.A.Y) - (triangle.B.X - triangle.A.X) * (triangle.C.Y - triangle.A.Y);
 

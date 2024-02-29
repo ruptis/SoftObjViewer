@@ -13,7 +13,7 @@ internal struct Viewport
         if (width == _width && height == _height) return;
         _width = width;
         _height = height;
-        Matrix = Matrix4x4.CreateViewportLeftHanded(0, 0, width, height, 0, 1);
+        Matrix = Matrix4x4.CreateViewportLeftHanded(0, 0, width - 1, height - 1, 0, 1);
     }
 
     public bool IsOutOfViewport(in Vector4 position) =>

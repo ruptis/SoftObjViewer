@@ -1,4 +1,4 @@
-﻿namespace GraphicsPipeline.Components.Rasterization.Interpolation;
+﻿namespace GraphicsPipeline.Components.Interpolation;
 
 public interface IScanlineInterpolator<T> where T : struct
 {

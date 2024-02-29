@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using Utils;
 namespace GraphicsPipeline.Components.Shaders.Debug;
 
 public sealed class ZFragmentShader : IFragmentShader<Vertex>

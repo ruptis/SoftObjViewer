@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Utils;
 namespace GraphicsPipeline.Components.Rasterization;
 
 public sealed class BresenhamRasterizer : IRasterizer<Vertex>

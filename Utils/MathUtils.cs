@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime.Intrinsics;
-namespace GraphicsPipeline.Components;
+namespace Utils;
 
 public static class MathUtils
 {

@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-namespace Benchmark;
+namespace Utils;
 
 public class Camera(float fieldOfView, float nearPlane, float farPlane, float aspectRatio)
 {

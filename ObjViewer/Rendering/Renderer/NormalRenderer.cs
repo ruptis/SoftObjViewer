@@ -1,8 +1,8 @@
 ﻿using GraphicsPipeline;
-using GraphicsPipeline.Components;
+using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
-using GraphicsPipeline.Components.Rasterization.Interpolation;
 using GraphicsPipeline.Components.Shaders.Debug;
+using Utils;
 namespace ObjViewer.Rendering.Renderer;
 
 public sealed class NormalRenderer : SimpleRenderer<NormalFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexScanlineInterpolator>>

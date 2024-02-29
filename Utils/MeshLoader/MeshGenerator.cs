@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
-using GraphicsPipeline.Components;
-using ObjViewer.Rendering;
-namespace ObjViewer.MeshLoader;
+﻿using System.Numerics;
+namespace Utils.MeshLoader;
 
 public class MeshGenerator : IMeshLoader
 {
@@ -53,7 +47,7 @@ public class MeshGenerator : IMeshLoader
             4, 5, 6, 6, 7, 4, // Front
             0, 4, 7, 7, 3, 0, // Left
             1, 2, 6, 6, 5, 1, // Right
-            0, 1, 5, 5, 4, 0,  // Bottom
+            0, 1, 5, 5, 4, 0, // Bottom
             3, 7, 6, 6, 2, 3, // Top
         ];
 
@@ -87,8 +81,8 @@ public class MeshGenerator : IMeshLoader
                 var z = MathF.Sin(theta) * MathF.Sin(phi);
                 vertices.Add(new Vertex()
                 {
-                    Position = new Vector3(x, y, z) * radius, 
-                    Normal = new Vector3(x, y, z), 
+                    Position = new Vector3(x, y, z) * radius,
+                    Normal = new Vector3(x, y, z),
                     TextureCoordinates = new Vector2(j / (float)segments, i / (float)segments)
                 });
             }
@@ -125,8 +119,8 @@ public class MeshGenerator : IMeshLoader
                 var z = (i / (float)segments - 0.5f) * size;
                 vertices.Add(new Vertex()
                 {
-                    Position = new Vector3(x, 0, z), 
-                    Normal = Vector3.UnitY, 
+                    Position = new Vector3(x, 0, z),
+                    Normal = Vector3.UnitY,
                     TextureCoordinates = new Vector2(j / (float)segments, i / (float)segments)
                 });
             }

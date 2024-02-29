@@ -1,88 +1,108 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using System.Numerics;
+﻿using System.Numerics;
 using Benchmark;
-using GraphicsPipeline.Components;
+using BenchmarkDotNet.Running;
+using GraphicsPipeline;
+using GraphicsPipeline.Components.Clipping;
+using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
-using GraphicsPipeline.Components.Rasterization.Interpolation;
 using GraphicsPipeline.Components.Shaders;
-using GraphicsPipeline.Components.Shaders.Phong;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-var meshLoader = new ObjParser();
-var textureLoader = new PngTextureLoader();
+using Utils;
+using Color = System.Drawing.Color;
 
-var model = new Model
+BenchmarkRunner.Run<Benchmarks>();
+
+return;
+
+var image = new Image<Rgba32>(1920, 1080);
+var rt = new ImageRenderTarget(image);
+
+var vertices = new Vertex[]
 {
-    Mesh = await meshLoader.LoadMeshAsync("ModelSamples/chest2.obj"),
-    DiffuseMap = await textureLoader.LoadTextureAsync("ModelSamples/textures/chest_diffuse2.png"),
-    NormalMap = await textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_normal.png", true),
-    SpecularMap = await textureLoader.LoadTextureAsync("ModelSamples/textures/chest_specular3.png"),
-    Transform = new Transform
+    new()
     {
-        Position = new Vector3(0f, -2f, 0f),
-        Rotation = Quaternion.CreateFromYawPitchRoll(0, -MathF.PI / 2, 0),
-        Scale = new Vector3(2f)
+        Position = new Vector3(-1, -1, 0)
+    },
+    new()
+    {
+        Position = new Vector3(1, -1, 0)
+    },
+    new()
+    {
+        Position = new Vector3(0, 2, 0)
     }
 };
 
-var image = new Image<Rgba32>(1920, 1080);
+var triangleTransform = new Transform();
 
-var renderTarget = new ImageRenderTarget(image);
-
-var camera = new Camera(renderTarget.Width / (float)renderTarget.Height);
-camera.Transform.Position = new Vector3(0, 2, 8);
+var camera = new Camera(1920 / (float)1080);
+camera.Transform.Position = new Vector3(0, 0, 2);
 camera.Transform.LookAt(Vector3.Zero, Vector3.UnitY);
 
-var vertexShader = new SimpleVertexShader();
-var fragmentShader = new PhongFragmentShader();
-var rasterizer = new HalfspaceTriangleRasterizer<Vertex,VertexHalfspaceInterpolator>();
-
-var pipeline = new GraphicsPipeline.GraphicsPipeline<Vertex, Vertex>(
-    vertexShader,
-    fragmentShader,
-    rasterizer);
-
-vertexShader.Model = model.Transform.WorldMatrix;
-vertexShader.Mvp = model.Transform.WorldMatrix * camera.ViewMatrix * camera.ProjectionMatrix;
-
-fragmentShader.ViewPosition = camera.Transform.Position;
-fragmentShader.LightPosition = new Vector3(0, 8, 8);
-
-/*fragmentShader.NormalMap = model.NormalMap ?? Texture.Checkerboard512;
-fragmentShader.DiffuseMap = model.DiffuseMap ?? Texture.Checkerboard512;
-fragmentShader.SpecularMap = model.SpecularMap ?? Texture.Checkerboard512;*/
-fragmentShader.Blinn = true;
-
-var drawTimer = new Stopwatch();
-var drawTimes = new List<TimeSpan>();
-
-for (var frame = 0; frame < 200; frame++)
+var vertexShader = new SimpleVertexShader
 {
-    drawTimer.Restart();
-    renderTarget.Clear(System.Drawing.Color.SlateGray);
-    pipeline.Render(model.Mesh.Vertices, model.Mesh.Indices, renderTarget);
-    renderTarget.Present();
-    drawTimer.Stop();
-    drawTimes.Add(drawTimer.Elapsed);
+    Mvp = triangleTransform.WorldMatrix * camera.ViewMatrix * camera.ProjectionMatrix,
+    Model = triangleTransform.WorldMatrix
+};
+
+var fragmentShader = new SimpleFragmentShader();
+
+var rasterizer = new BresenhamRasterizer();
+
+var clipper = new Clipper<Vertex, VertexLinearInterpolator>();
+
+var viewportMatrix = Matrix4x4.CreateViewportLeftHanded(0, 0, 1920 - 1, 1080 - 1, 0, 1);
+rt.Clear(Color.SlateGray);
+
+vertexShader.ProcessVertex(in vertices[0], out Vertex output1, out Vector4 clip1);
+vertexShader.ProcessVertex(in vertices[1], out Vertex output2, out Vector4 clip2);
+vertexShader.ProcessVertex(in vertices[2], out Vertex output3, out Vector4 clip3);
+
+var triangle = new Triangle<Vertex>
+{
+    A = clip1,
+    B = clip2,
+    C = clip3,
+    AData = output1,
+    BData = output2,
+    CData = output3
+};
+
+Span<Triangle<Vertex>> clippedTriangles = stackalloc Triangle<Vertex>[10];
+var count = clipper.ClipTriangle(in triangle, ref clippedTriangles);
+
+for (var i = 0; i < count; i++)
+{
+    ToScreenSpace(ref clippedTriangles[i]);
+
+    rasterizer.Rasterize(in clippedTriangles[i], fragment =>
+    {
+        fragmentShader.ProcessFragment(in fragment.Position, in fragment.Data, out Color color);
+        rt.SetPixel(fragment.Position.X, fragment.Position.Y, fragment.Position.Z, in color);
+    });
 }
 
+rt.Present();
 image.Save("output.png");
 
-var averageDrawTime = drawTimes.Skip(100).Average(t => t.TotalMilliseconds);
+void ToScreenSpace(ref Triangle<Vertex> triangle)
+{
+    var wA = ToNdc(ref triangle.A);
+    var wB = ToNdc(ref triangle.B);
+    var wC = ToNdc(ref triangle.C);
+    triangle.A = Vector4.Transform(triangle.A, viewportMatrix);
+    triangle.B = Vector4.Transform(triangle.B, viewportMatrix);
+    triangle.C = Vector4.Transform(triangle.C, viewportMatrix);
 
-FileStream fileStream = File.OpenWrite("output.txt");
-await using var writer = new StreamWriter(fileStream);
-await writer.WriteLineAsync($"Average draw time: {averageDrawTime} ms");
-await writer.WriteLineAsync($"Total draw time: {drawTimes.Sum(t => t.TotalMilliseconds)} ms");
-await writer.WriteLineAsync($"Total frames: {drawTimes.Count}");
-await writer.WriteLineAsync($"Average FPS: {1000.0 / averageDrawTime}");
-await writer.WriteLineAsync($"Vertex count: {model.Mesh.Vertices.Count}");
-await writer.WriteLineAsync($"Triangle count: {model.Mesh.Indices.Count / 3}");
-await writer.WriteLineAsync($"Resolution: {image.Width}x{image.Height}");
-await writer.WriteLineAsync("\n\n");
-await writer.WriteLineAsync("Draw times:");
-foreach (TimeSpan drawTime in drawTimes)
-    await writer.WriteLineAsync(drawTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
-await writer.FlushAsync();
-Console.WriteLine("Benchmark finished");
+    triangle.A.W = wA;
+    triangle.B.W = wB;
+    triangle.C.W = wC;
+}
+
+float ToNdc(ref Vector4 position)
+{
+    var w = 1.0f / position.W;
+    position *= w;
+    return w;
+}

@@ -1,9 +1,10 @@
 ﻿using System.Numerics;
 using GraphicsPipeline;
 using GraphicsPipeline.Components;
+using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
-using GraphicsPipeline.Components.Rasterization.Interpolation;
 using GraphicsPipeline.Components.Shaders;
+using Utils;
 namespace ObjViewer.Rendering.Renderer;
 
 public sealed class FlatLambertRenderer : SimpleRenderer<LambertFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexScanlineInterpolator>>
@@ -14,7 +15,7 @@ public sealed class FlatLambertRenderer : SimpleRenderer<LambertFragmentShader, 
         base.OnDraw(model, camera, renderTarget);
 
         FragmentShader.LightPosition = LightPosition;
-        
+
         Rasterizer.InterpolationEnabled = false;
     }
 }

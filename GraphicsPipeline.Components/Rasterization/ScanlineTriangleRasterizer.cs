@@ -1,13 +1,14 @@
 ﻿using System.Numerics;
-using GraphicsPipeline.Components.Rasterization.Interpolation;
+using GraphicsPipeline.Components.Interpolation;
+using Utils;
 namespace GraphicsPipeline.Components.Rasterization;
 
-public sealed class ScanlineTriangleRasterizer<T, TInterpolator> : IRasterizer<T> 
-    where T : struct 
+public sealed class ScanlineTriangleRasterizer<T, TInterpolator> : IRasterizer<T>
+    where T : struct
     where TInterpolator : IScanlineInterpolator<T>, new()
 {
     private readonly IScanlineInterpolator<T> _interpolator = new TInterpolator();
-    
+
     public bool InterpolationEnabled { get; set; } = true;
 
     public void Rasterize(in Triangle<T> triangle, Action<Fragment<T>> fragmentCallback)

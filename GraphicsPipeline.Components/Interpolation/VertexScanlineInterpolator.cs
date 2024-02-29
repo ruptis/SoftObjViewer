@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
-namespace GraphicsPipeline.Components.Rasterization.Interpolation;
+using Utils;
+namespace GraphicsPipeline.Components.Interpolation;
 
 public sealed class VertexScanlineInterpolator : IScanlineInterpolator<Vertex>
 {

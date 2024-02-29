@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-namespace GraphicsPipeline.Components.Rasterization.Interpolation;
+namespace GraphicsPipeline.Components.Interpolation;
 
 public interface IHalfspaceInterpolator<T> where T : struct
 {

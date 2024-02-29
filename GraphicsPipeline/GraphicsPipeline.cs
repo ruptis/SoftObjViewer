@@ -8,6 +8,7 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
     private readonly IVertexShader<TVIn, TFIn> _vertexShader;
     private readonly IFragmentShader<TFIn> _fragmentShader;
     private readonly IRasterizer<TFIn> _rasterizer;
+    private readonly IClipper<TFIn> _clipper;
 
     private readonly Action<int> _cachedRenderCallback;
     private readonly Action<Fragment<TFIn>> _cachedFragmentCallback;
@@ -18,16 +19,22 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
     private IReadOnlyList<TVIn> _vertices = null!;
     private IReadOnlyList<int> _indices = null!;
 
-    public GraphicsPipeline(IVertexShader<TVIn, TFIn> vertexShader, IFragmentShader<TFIn> fragmentShader, IRasterizer<TFIn> rasterizer)
+    public GraphicsPipeline(
+        IVertexShader<TVIn, TFIn> vertexShader,
+        IFragmentShader<TFIn> fragmentShader,
+        IRasterizer<TFIn> rasterizer,
+        IClipper<TFIn> clipper)
     {
         _vertexShader = vertexShader;
         _fragmentShader = fragmentShader;
         _rasterizer = rasterizer;
+        _clipper = clipper;
         _cachedRenderCallback = RenderTriangle;
         _cachedFragmentCallback = ProcessFragment;
     }
 
     public bool BackfaceCullingEnabled { get; set; } = true;
+    public bool ScissorTestEnabled { get; set; }
 
     public void Render(IReadOnlyList<TVIn> vertices, IReadOnlyList<int> indices, IRenderTarget renderTarget)
     {
@@ -51,8 +58,7 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
         _vertexShader.ProcessVertex(v1, out TFIn v1Out, out Vector4 position1);
         _vertexShader.ProcessVertex(v2, out TFIn v2Out, out Vector4 position2);
 
-        if (ClipTriangle(in position0, in position1, in position2) ||
-            BackfaceCullingEnabled && CullTriangle(in position0, in position1, in position2))
+        if (BackfaceCullingEnabled && CullTriangle(in position0, in position1, in position2))
             return;
 
         var triangle = new Triangle<TFIn>
@@ -64,36 +70,28 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
             BData = v1Out,
             CData = v2Out
         };
-        
-        ToScreenSpace(ref triangle);
-        _rasterizer.Rasterize(in triangle, _cachedFragmentCallback);
+
+        Span<Triangle<TFIn>> triangles = stackalloc Triangle<TFIn>[6];
+
+        var count = _clipper.ClipTriangle(in triangle, ref triangles);
+
+        for (var i = 0; i < count; i++)
+        {
+            ToScreenSpace(ref triangles[i]);
+            _rasterizer.Rasterize(in triangles[i], _cachedFragmentCallback);
+        }
     }
 
     private void ProcessFragment(Fragment<TFIn> fragment)
     {
-        if (_viewport.IsOutOfViewport(in fragment.Position)) return;
+        if (ScissorTestEnabled && _viewport.IsOutOfViewport(in fragment.Position))
+            return;
+
+        if (!_renderTarget.ZTest(fragment.Position.X, fragment.Position.Y, fragment.Position.Z))
+            return;
+
         _fragmentShader.ProcessFragment(in fragment.Position, in fragment.Data, out Color color);
-        _renderTarget.DrawPixel(fragment.Position.X, fragment.Position.Y, fragment.Position.Z, in color);
-    }
-
-    private static bool ClipTriangle(in Vector4 position0, in Vector4 position1, in Vector4 position2)
-    {
-        if (position0.X < -position0.W && position1.X < -position1.W && position2.X < -position2.W)
-            return true;
-
-        if (position0.X > position0.W && position1.X > position1.W && position2.X > position2.W)
-            return true;
-
-        if (position0.Y < -position0.W && position1.Y < -position1.W && position2.Y < -position2.W)
-            return true;
-
-        if (position0.Y > position0.W && position1.Y > position1.W && position2.Y > position2.W)
-            return true;
-
-        if (position0.Z < 0 && position1.Z < 0 && position2.Z < 0)
-            return true;
-
-        return position0.Z > position0.W && position1.Z > position1.W && position2.Z > position2.W;
+        _renderTarget.SetPixel(fragment.Position.X, fragment.Position.Y, fragment.Position.Z, in color);
     }
 
     private void ToScreenSpace(ref Triangle<TFIn> triangle)

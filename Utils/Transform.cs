@@ -1,10 +1,10 @@
 ﻿using System.Numerics;
-namespace Benchmark;
+namespace Utils;
 
 public sealed class Transform(Vector3 scale, Quaternion rotation, Vector3 position)
 {
     public static Transform Identity => new(Vector3.One, Quaternion.Identity, Vector3.Zero);
-    
+
     public Transform() : this(Vector3.One, Quaternion.Identity, Vector3.Zero)
     {}
 
