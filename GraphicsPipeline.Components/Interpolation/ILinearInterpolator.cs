@@ -1,4 +1,4 @@
-﻿namespace GraphicsPipeline;
+﻿namespace GraphicsPipeline.Components.Interpolation;
 
 public interface ILinearInterpolator<T> where T : unmanaged
 {

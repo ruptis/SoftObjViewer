@@ -1,8 +1,9 @@
 ﻿using System.Numerics;
+using GraphicsPipeline;
 using GraphicsPipeline.Components.Interpolation;
-namespace GraphicsPipeline.Components.Clipping;
+namespace Benchmark;
 
-public sealed class Clipper<T, TInterpolator> : IClipper<T>
+public sealed class Clipper3<T, TInterpolator> : IClipper<T>
     where T : unmanaged
     where TInterpolator : ILinearInterpolator<T>, new()
 {
@@ -124,4 +125,5 @@ public sealed class Clipper<T, TInterpolator> : IClipper<T>
 
         return triangleCount;
     }
+
 }

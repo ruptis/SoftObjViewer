@@ -11,11 +11,27 @@ using SixLabors.ImageSharp.PixelFormats;
 using Utils;
 using Color = System.Drawing.Color;
 
-BenchmarkRunner.Run<Benchmarks>();
+BenchmarkRunner.Run<ClippingBenchmark>();
+
+var benchmark = new ClippingBenchmark
+{
+    CameraZ = 5
+};
+
+await benchmark.Setup();
+benchmark.Run();
+
+benchmark = new ClippingBenchmark
+{
+    CameraZ = 10
+};
+
+await benchmark.Setup();
+benchmark.Run();
 
 return;
 
-var image = new Image<Rgba32>(1920, 1080);
+/*var image = new Image<Rgba32>(1920, 1080);
 var rt = new ImageRenderTarget(image);
 
 var vertices = new Vertex[]
@@ -105,4 +121,4 @@ float ToNdc(ref Vector4 position)
     var w = 1.0f / position.W;
     position *= w;
     return w;
-}
+}*/

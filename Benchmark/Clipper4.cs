@@ -1,8 +1,9 @@
 ﻿using System.Numerics;
+using GraphicsPipeline;
 using GraphicsPipeline.Components.Interpolation;
-namespace GraphicsPipeline.Components.Clipping;
+namespace Benchmark;
 
-public sealed class Clipper<T, TInterpolator> : IClipper<T>
+public sealed class Clipper4<T, TInterpolator> : IClipper<T>
     where T : unmanaged
     where TInterpolator : ILinearInterpolator<T>, new()
 {
@@ -43,41 +44,37 @@ public sealed class Clipper<T, TInterpolator> : IClipper<T>
         var totalVertices = 3;
         for (var i = 0; i < _planes.Length; i++)
         {
-            var verticesCount = outVerticesCount;
-
             if (outVerticesCount < 2)
                 break;
 
             outVertices.CopyTo(inVertices);
-            outVerticesCount = 0;
 
             ref Vector4 plane = ref _planes[i];
             var fullOutside = true;
             var fullInside = true;
 
-            for (var j = 0; j < verticesCount; j++)
+            for (var j = 0; j < outVerticesCount; j++)
             {
                 planeTests[j] = Vector4.Dot(plane, vertices[inVertices[j]].Position);
                 insideTests[j] = planeTests[j] >= 0.0f;
                 fullOutside &= !insideTests[j];
                 fullInside &= insideTests[j];
             }
-
-            if (fullOutside)
-                break;
             
             if (fullInside)
-            {
-                outVerticesCount = verticesCount;
                 continue;
-            }
+            
+            var inVerticesCount = outVerticesCount;
+            outVerticesCount = 0;
+            
+            if (fullOutside)
+                break;
 
-            for (var j = 0; j < verticesCount; j++)
+            for (var j = 0; j < inVerticesCount; j++)
             {
-                var next = (j + 1) % verticesCount;
+                var next = (j + 1) % inVerticesCount;
 
-                var first = inVertices[j];
-                var second = inVertices[next];
+                var secondIndex = inVertices[next];
 
                 var firstInside = insideTests[j];
                 var secondInside = insideTests[next];
@@ -85,16 +82,17 @@ public sealed class Clipper<T, TInterpolator> : IClipper<T>
                 if (firstInside != secondInside)
                 {
                     var t = -planeTests[j] / (planeTests[next] - planeTests[j]);
-                    T interpolated = _interpolator.Interpolate(in vertices[first].Data, in vertices[second].Data, t);
-                    Vector4 interpolatedPosition = Vector4.Lerp(vertices[first].Position, vertices[second].Position, t);
+                    T interpolated = _interpolator.Interpolate(in vertices[inVertices[j]].Data, in vertices[inVertices[secondIndex]].Data, t);
+                    Vector4 interpolatedPosition = Vector4.Lerp(vertices[inVertices[j]].Position, vertices[inVertices[secondIndex]].Position, t);
                     vertices[totalVertices] = new Vertex(interpolatedPosition, interpolated);
                     outVertices[outVerticesCount++] = totalVertices++;
+                    
                     if (!firstInside)
-                        outVertices[outVerticesCount++] = second;
+                        outVertices[outVerticesCount++] = secondIndex;
                 }
                 else if (firstInside && secondInside)
                 {
-                    outVertices[outVerticesCount++] = second;
+                    outVertices[outVerticesCount++] = secondIndex;
                 }
             }
         }
