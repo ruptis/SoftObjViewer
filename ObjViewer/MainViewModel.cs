@@ -7,7 +7,7 @@ namespace ObjViewer;
 
 public sealed class MainViewModel : INotifyPropertyChanged
 {
-    public record RenderMode(string Name, IModelRenderer Renderer);
+    public record RenderMode(string Name, ISceneRenderer Renderer);
     public MainViewModel()
     {
         RenderModes = new ObservableCollection<RenderMode>
@@ -20,6 +20,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
             new("Blinn-Phong", new BlinnPhongRenderer()),
             new("Textured Phong", new TexturedPhongRenderer()),
             new("Textured Blinn-Phong", new TexturedBlinnPhongRenderer()),
+            new("HDR Phong", new HdrPhongRenderer()),
+            new("PBR", new PbrRenderer()),
             new("Normal", new NormalRenderer()),
             new("UV", new UvRenderer()),
             new("Depth", new DepthRenderer()),

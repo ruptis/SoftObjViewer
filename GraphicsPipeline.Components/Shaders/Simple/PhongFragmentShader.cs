@@ -1,7 +1,6 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using Utils;
-namespace GraphicsPipeline.Components.Shaders;
+namespace GraphicsPipeline.Components.Shaders.Simple;
 
 public sealed class PhongFragmentShader : IFragmentShader<Vertex>
 {
@@ -16,7 +15,7 @@ public sealed class PhongFragmentShader : IFragmentShader<Vertex>
 
     public bool Blinn { get; set; }
 
-    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Vector4 color)
     {
         Vector3 lightDirection = Vector3.Normalize(LightPosition - input.Position);
         Vector3 viewDirection = Vector3.Normalize(ViewPosition - input.Position);
@@ -48,6 +47,6 @@ public sealed class PhongFragmentShader : IFragmentShader<Vertex>
 
         Vector3 finalColor = ambientComponent + diffuseComponent + specularComponent;
         finalColor = Vector3.Clamp(finalColor, Vector3.Zero, Vector3.One);
-        color = Color.FromArgb((int)(finalColor.X * 255), (int)(finalColor.Y * 255), (int)(finalColor.Z * 255));
+        color = new Vector4(finalColor, 1.0f);
     }
 }

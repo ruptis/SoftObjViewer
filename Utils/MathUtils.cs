@@ -11,9 +11,23 @@ public static class MathUtils
     public static Vector2 PerspectiveCorrectLerp(Vector2 min, Vector2 max, float zMin, float zMax, float amount) =>
         Vector2.Lerp(min / zMin, max / zMax, amount) / float.Lerp(1f / zMin, 1f / zMax, amount);
 
-    public static Vector3 Pow(in Vector3 value, float power) => new(
+    public static Vector3 Pow(this in Vector3 value, float power) => new(
         MathF.Pow(value.X, power),
         MathF.Pow(value.Y, power),
         MathF.Pow(value.Z, power)
+    );
+    
+    public static Vector4 Pow(this in Vector4 value, float power) => new(
+        MathF.Pow(value.X, power),
+        MathF.Pow(value.Y, power),
+        MathF.Pow(value.Z, power),
+        MathF.Pow(value.W, power)
+    );
+
+    public static Matrix4x4 TbnSpace(in Vector3 tangent, in Vector3 bitangent, in Vector3 normal) => new(
+        tangent.X, tangent.Y, tangent.Z, 0.0f,
+        bitangent.X, bitangent.Y, bitangent.Z, 0.0f,
+        normal.X, normal.Y, normal.Z, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f
     );
 }

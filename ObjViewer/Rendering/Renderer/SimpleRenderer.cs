@@ -1,17 +1,17 @@
 ﻿using GraphicsPipeline;
 using GraphicsPipeline.Components.Clipping;
 using GraphicsPipeline.Components.Interpolation;
-using GraphicsPipeline.Components.Shaders;
+using GraphicsPipeline.Components.Shaders.Simple;
 using Utils;
 namespace ObjViewer.Rendering.Renderer;
 
-public class SimpleRenderer<TF, TR> : ModelRenderer<Vertex, SimpleVertexShader, TF, TR, Clipper<Vertex, VertexLinearInterpolator>>
+public class SimpleRenderer<TF, TR> : SceneRenderer<Vertex, SimpleVertexShader, TF, TR, Clipper<Vertex, VertexLinearInterpolator>>
     where TF : IFragmentShader<Vertex>, new()
     where TR : IRasterizer<Vertex>, new()
 {
-    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
+    protected override void OnRenderScene(in Scene scene, IRenderTarget renderTarget)
     {
-        VertexShader.Model = model.Transform.WorldMatrix;
-        VertexShader.Mvp = model.Transform.WorldMatrix * camera.ViewMatrix * camera.ProjectionMatrix;
+        VertexShader.Model = scene.Model.Transform.WorldMatrix;
+        VertexShader.Mvp = scene.Model.Transform.WorldMatrix * scene.Camera.ViewMatrix * scene.Camera.ProjectionMatrix;
     }
 }

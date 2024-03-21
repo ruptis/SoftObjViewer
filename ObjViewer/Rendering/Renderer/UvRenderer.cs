@@ -7,10 +7,9 @@ namespace ObjViewer.Rendering.Renderer;
 
 public sealed class UvRenderer : SimpleRenderer<UvFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexScanlineInterpolator>>
 {
-    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
+    protected override void OnRenderScene(in Scene scene, IRenderTarget renderTarget)
     {
-        base.OnDraw(in model, in camera, renderTarget);
-
-        FragmentShader.Texture = model.DiffuseMap ?? Texture.Checkerboard512;
+        base.OnRenderScene(in scene, renderTarget);
+        FragmentShader.Texture = scene.Model.DiffuseMap;
     }
 }

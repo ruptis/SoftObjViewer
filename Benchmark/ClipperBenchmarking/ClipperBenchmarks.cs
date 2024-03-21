@@ -11,9 +11,9 @@ using Utils;
 using Utils.MeshLoader;
 using Utils.TextureLoader;
 using Color = System.Drawing.Color;
-namespace Benchmark;
+namespace Benchmark.ClipperBenchmarking;
 
-public class Benchmarks
+public class ClipperBenchmarks
 {
     private const int MaxWidth = 1920;
     private const int MaxHeight = 1080;
@@ -37,15 +37,15 @@ public class Benchmarks
         _model = new Model
         {
             Mesh = await meshLoader.LoadMeshAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\chest2.obj"),
-            DiffuseMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_diffuse2.png"),
-            NormalMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\KittyChest_low_normal.png", true),
-            SpecularMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_specular3.png"),
             Transform = new Transform
             {
                 Position = new Vector3(0f, -2f, 0f),
                 Rotation = Quaternion.CreateFromYawPitchRoll(0, -MathF.PI / 2, 0),
                 Scale = new Vector3(2f)
-            }
+            },
+            DiffuseMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_diffuse2.png"),
+            NormalMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\KittyChest_low_normal.png", true),
+            SpecularMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_specular3.png"),
         };
 
         var camera = new Camera(MaxWidth / (float)MaxHeight);
@@ -60,7 +60,7 @@ public class Benchmarks
         _pipelines[3] = SetupHalfspace(camera, new Clipper<PhongShaderInput, PhongLinearInterpolator>());
 
         foreach (ImageRenderTarget rt in _renderTargets)
-            rt.Clear(Color.SlateGray);
+            rt.Clear(Color.SlateGray.ToVector());
     }
 
     private GraphicsPipeline<Vertex, PhongShaderInput> SetupScanline(Camera camera, IClipper<PhongShaderInput> clipper)
@@ -75,9 +75,9 @@ public class Benchmarks
         vertexShader.ViewPosition = camera.Transform.Position;
         vertexShader.LightPosition = new Vector3(0, 8, 8);
 
-        fragmentShader.DiffuseMap = _model.DiffuseMap ?? Texture.Checkerboard512;
-        fragmentShader.NormalMap = _model.NormalMap ?? Texture.Checkerboard512;
-        fragmentShader.SpecularMap = _model.SpecularMap ?? Texture.Checkerboard512;
+        fragmentShader.DiffuseMap = _model.DiffuseMap;
+        fragmentShader.NormalMap = _model.NormalMap;
+        fragmentShader.SpecularMap = _model.SpecularMap;
 
         fragmentShader.Blinn = true;
 
@@ -100,9 +100,9 @@ public class Benchmarks
         vertexShader.ViewPosition = camera.Transform.Position;
         vertexShader.LightPosition = new Vector3(0, 8, 8);
 
-        fragmentShader.DiffuseMap = _model.DiffuseMap ?? Texture.Checkerboard512;
-        fragmentShader.NormalMap = _model.NormalMap ?? Texture.Checkerboard512;
-        fragmentShader.SpecularMap = _model.SpecularMap ?? Texture.Checkerboard512;
+        fragmentShader.DiffuseMap = _model.DiffuseMap;
+        fragmentShader.NormalMap = _model.NormalMap;
+        fragmentShader.SpecularMap = _model.SpecularMap;
 
         fragmentShader.Blinn = true;
 

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using GraphicsPipeline;
 using GraphicsPipeline.Components.Interpolation;
-namespace Benchmark;
+namespace Benchmark.ClipperBenchmarking;
 
 public sealed class Clipper3<T, TInterpolator> : IClipper<T>
     where T : unmanaged

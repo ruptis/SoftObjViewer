@@ -1,46 +1,59 @@
-﻿using System.Drawing;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using GraphicsPipeline;
 namespace Utils;
 
-public abstract class PresentableRenderTarget(int width, int height) : IRenderTarget
+public abstract class PresentableRenderTarget<T>(int width, int height) : IRenderTarget
 {
-    protected readonly int[] BackBuffer = new int[width * height];
+    private readonly int[] _lockBuffer = new int[width * height];
+    protected readonly T[] ColorBuffer = new T[width * height];
     protected readonly float[] DepthBuffer = new float[width * height];
 
     public int Width { get; } = width;
     public int Height { get; } = height;
 
     public abstract void Present();
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected abstract T TransformColor(in Vector4 color);
 
-    public void SetPixel(float x, float y, float z, in Color color)
+    public void SetPixel(float x, float y, in Vector4 color)
     {
-        var index = (int)(y * Width + x);
-        var currentZ = DepthBuffer[index];
+        var index = GetIndex(x, y);
+        ColorBuffer[index] = TransformColor(color);
+    }
 
-        while (z < currentZ)
+    public bool DepthTestAndLock(float x, float y, float z)
+    {
+        var index = GetIndex(x, y);
+        var currentZ = DepthBuffer[index];
+        
+        while(z < currentZ)
         {
-            if (ZTestInterloked(index, z, currentZ))
+            if (Interlocked.CompareExchange(ref _lockBuffer[index], 1, 0) == 0)
             {
-                BackBuffer[index] = color.ToArgb();
-                break;
+                if (Math.Abs(Interlocked.CompareExchange(ref DepthBuffer[index], z, currentZ) - currentZ) < float.Epsilon)
+                    return true;
+                
+                Interlocked.Exchange(ref _lockBuffer[index], 0);
             }
             currentZ = DepthBuffer[index];
         }
+        
+        return false;
     }
 
-    public bool ZTest(float x, float y, float z)
-    {
-        var index = (int)(y * Width + x);
-        return DepthBuffer[index] > z;
-    }
+    public void UnlockPixel(float x, float y) => 
+        Interlocked.Exchange(ref _lockBuffer[GetIndex(x, y)], 0);
 
-
-    public void Clear(in Color color)
+    public void Clear(in Vector4 color)
     {
-        Array.Fill(BackBuffer, color.ToArgb());
+        Array.Fill(ColorBuffer, TransformColor(color));
         Array.Fill(DepthBuffer, float.MaxValue);
     }
 
-    private bool ZTestInterloked(int index, float z, float currentZ) =>
-        Math.Abs(Interlocked.CompareExchange(ref DepthBuffer[index], z, currentZ) - currentZ) < float.Epsilon;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private int GetIndex(float x, float y) => 
+        (int)(y * Width + x);
+
 }

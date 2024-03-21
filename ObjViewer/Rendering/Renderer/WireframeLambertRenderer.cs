@@ -1,16 +1,16 @@
 ﻿using System.Numerics;
 using GraphicsPipeline;
 using GraphicsPipeline.Components.Rasterization;
-using GraphicsPipeline.Components.Shaders;
+using GraphicsPipeline.Components.Shaders.Simple;
 using Utils;
 namespace ObjViewer.Rendering.Renderer;
 
 public sealed class WireframeLambertRenderer : SimpleRenderer<LambertFragmentShader, BresenhamRasterizer>
 {
     private static readonly Vector3 LightPosition = new(0, 8, 8);
-    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
+    protected override void OnRenderScene(in Scene scene, IRenderTarget renderTarget)
     {
-        base.OnDraw(model, camera, renderTarget);
+        base.OnRenderScene(in scene, renderTarget);
         BackfaceCulling = false;
 
         FragmentShader.LightPosition = LightPosition;

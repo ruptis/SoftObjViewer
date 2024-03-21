@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using Utils;
 namespace GraphicsPipeline.Components.Shaders.Phong;
 
@@ -15,13 +14,13 @@ public sealed class TexturedPhongFragmentShader : IFragmentShader<PhongShaderInp
 
     public bool Blinn { get; set; }
 
-    public void ProcessFragment(in Vector4 fragCoord, in PhongShaderInput input2, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in PhongShaderInput input, out Vector4 color)
     {
-        Vector3 normal = NormalMap.SampleNormal(input2.TextureCoordinates);
-        Vector3 diffuseSample = DiffuseMap.SampleColor(input2.TextureCoordinates);
-        Vector3 specularSample = SpecularMap.SampleColor(input2.TextureCoordinates);
+        Vector3 normal = NormalMap.SampleNormal(input.TextureCoordinates);
+        Vector3 diffuseSample = DiffuseMap.SampleColor(input.TextureCoordinates);
+        Vector3 specularSample = SpecularMap.SampleColor(input.TextureCoordinates);
 
-        var lambertian = Vector3.Dot(input2.LightDirection, normal);
+        var lambertian = Vector3.Dot(input.LightDirection, normal);
 
         Vector3 ambientComponent = AmbientColor * diffuseSample;
         Vector3 diffuseComponent = Math.Max(lambertian, 0.0f) * diffuseSample * LightColor;
@@ -33,24 +32,19 @@ public sealed class TexturedPhongFragmentShader : IFragmentShader<PhongShaderInp
 
             if (Blinn)
             {
-                Vector3 halfVector = Vector3.Normalize(input2.LightDirection + input2.ViewDirection);
+                Vector3 halfVector = Vector3.Normalize(input.LightDirection + input.ViewDirection);
                 specular = MathF.Pow(Math.Max(Vector3.Dot(halfVector, normal), 0.0f), Shininess);
             }
             else
             {
-                Vector3 reflectDirection = Vector3.Reflect(-input2.LightDirection, normal);
-                specular = MathF.Pow(Math.Max(Vector3.Dot(reflectDirection, input2.ViewDirection), 0.0f), Shininess);
+                Vector3 reflectDirection = Vector3.Reflect(-input.LightDirection, normal);
+                specular = MathF.Pow(Math.Max(Vector3.Dot(reflectDirection, input.ViewDirection), 0.0f), Shininess);
             }
 
             specularComponent = specular * specularSample * LightColor;
         }
 
         Vector3 finalColor = ambientComponent + diffuseComponent + specularComponent;
-        finalColor = Vector3.Clamp(finalColor, Vector3.Zero, Vector3.One);
-        color = Color.FromArgb(
-            (byte)(finalColor.X * 255),
-            (byte)(finalColor.Y * 255),
-            (byte)(finalColor.Z * 255)
-        );
+        color = new Vector4(finalColor, 1.0f);
     }
 }

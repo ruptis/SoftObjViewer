@@ -17,6 +17,7 @@
         <PackageReference Include="BenchmarkDotNet" Version="0.13.12"/>
         <PackageReference Include="SimpleSIMD" Version="4.6.0" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2"/>
+        <PackageReference Include="SixLabors.ImageSharp.Textures" Version="0.0.0-alpha.0.140" />
     </ItemGroup>
 
 </Project>

@@ -6,10 +6,11 @@ using GraphicsPipeline;
 using GraphicsPipeline.Components.Clipping;
 using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Shaders;
+using GraphicsPipeline.Components.Shaders.Simple;
 using Utils;
 using Utils.MeshLoader;
 using Utils.TextureLoader;
-namespace Benchmark;
+namespace Benchmark.ClipperBenchmarking;
 
 public class ClippingBenchmark
 {
@@ -37,15 +38,15 @@ public class ClippingBenchmark
         var model = new Model
         {
             Mesh = await meshLoader.LoadMeshAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\chest2.obj"),
-            DiffuseMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_diffuse2.png"),
-            NormalMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\KittyChest_low_normal.png", true),
-            SpecularMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_specular3.png"),
             Transform = new Transform
             {
                 Position = new Vector3(0f, -2f, 0f),
                 Rotation = Quaternion.CreateFromYawPitchRoll(0, -MathF.PI / 2, 0),
                 Scale = new Vector3(2f)
-            }
+            },
+            DiffuseMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_diffuse2.png"),
+            NormalMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\KittyChest_low_normal.png", true),
+            SpecularMap = await textureLoader.LoadTextureAsync(@"C:\Users\coolp\OneDrive - bsuir.by\Рабочий стол\bsuir\3 курс\2 семестр\АКГ\ObjViewer\Benchmark\bin\Release\net8.0\ModelSamples\textures\chest_specular3.png"),
         };
 
         var camera = new Camera(1920 / (float)1080);

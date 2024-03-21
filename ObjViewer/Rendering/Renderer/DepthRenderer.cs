@@ -1,5 +1,4 @@
-﻿using GraphicsPipeline.Components;
-using GraphicsPipeline.Components.Interpolation;
+﻿using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.Debug;
 using Utils;

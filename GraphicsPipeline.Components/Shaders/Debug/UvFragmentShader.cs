@@ -7,9 +7,9 @@ public sealed class UvFragmentShader : IFragmentShader<Vertex>
 {
     public Texture Texture { get; set; }
 
-    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Vector4 color)
     {
         Vector3 pixel = Texture.SampleColor(input.TextureCoordinates);
-        color = Color.FromArgb((byte)(pixel.X * 255), (byte)(pixel.Y * 255), (byte)(pixel.Z * 255));
+        color = new Vector4(pixel, 1.0f);
     }
 }

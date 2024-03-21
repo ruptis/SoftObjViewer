@@ -5,6 +5,12 @@ public readonly struct Texture(int width, int height, Vector3[] data)
 {
     public static Texture Checkerboard256 { get; } = new(256, 256, CreateCheckerboard(256));
     public static Texture Checkerboard512 { get; } = new(512, 512, CreateCheckerboard(512));
+
+    public int Width => width;
+    public int Height => height;
+    public Vector3[] Data => data;
+
+    public Texture(int width, int height) : this(width, height, new Vector3[width * height]) { }
     
     public ref Vector3 SampleColor(in Vector2 uv)
     {
@@ -23,6 +29,21 @@ public readonly struct Texture(int width, int height, Vector3[] data)
         var x = (int)(uv.X * width) % width;
         var y = (int)(uv.Y * height) % height;
         return y * width + x;
+    }
+    
+    public static Texture CreateRmaTexture(in Texture roughness, in Texture metallic, in Texture ao)
+    {
+        var width = roughness.Width;
+        var height = roughness.Height;
+        var data = new Vector3[width * height];
+        for (var i = 0; i < data.Length; i++)
+        {
+            var r = roughness.Data[i].X;
+            var m = metallic.Data[i].X;
+            var a = ao.Data[i].X;
+            data[i] = new Vector3(r, m, a);
+        }
+        return new Texture(width, height, data);
     }
 
     private static Vector3[] CreateCheckerboard(int size)

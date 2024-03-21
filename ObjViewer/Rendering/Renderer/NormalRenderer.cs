@@ -7,9 +7,9 @@ namespace ObjViewer.Rendering.Renderer;
 
 public sealed class NormalRenderer : SimpleRenderer<NormalFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexScanlineInterpolator>>
 {
-    protected override void OnDraw(in Model model, in Camera camera, IRenderTarget renderTarget)
+    protected override void OnRenderScene(in Scene scene, IRenderTarget renderTarget)
     {
-        base.OnDraw(in model, in camera, renderTarget);
-        FragmentShader.NormalTexture = model.NormalMap;
+        base.OnRenderScene(in scene, renderTarget);
+        FragmentShader.NormalTexture = scene.Model.NormalTexture;
     }
 }

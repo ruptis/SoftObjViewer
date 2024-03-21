@@ -5,9 +5,8 @@ namespace GraphicsPipeline.Components.Shaders.Debug;
 
 public sealed class ZFragmentShader : IFragmentShader<Vertex>
 {
-    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Color color)
+    public void ProcessFragment(in Vector4 fragCoord, in Vertex input, out Vector4 color)
     {
-        var colorComponent = (byte)(fragCoord.W * 255);
-        color = Color.FromArgb(colorComponent, colorComponent, colorComponent);
+        color = new Vector4(input.Position.Z, input.Position.Z, input.Position.Z, 1.0f);
     }
 }

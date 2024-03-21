@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using Utils;
-namespace GraphicsPipeline.Components.Shaders;
+namespace GraphicsPipeline.Components.Shaders.Simple;
 
 public sealed class SimpleVertexShader : IVertexShader<Vertex, Vertex>
 {
