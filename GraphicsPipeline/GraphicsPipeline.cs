@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.Intrinsics;
 namespace GraphicsPipeline;
 
@@ -9,6 +8,7 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
     private readonly IFragmentShader<TFIn> _fragmentShader;
     private readonly IRasterizer<TFIn> _rasterizer;
     private readonly IClipper<TFIn> _clipper;
+    private IPostProcessor? _postProcessor;
 
     private readonly Action<int> _cachedRenderCallback;
     private readonly Action<Fragment<TFIn>> _cachedFragmentCallback;
@@ -23,18 +23,23 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
         IVertexShader<TVIn, TFIn> vertexShader,
         IFragmentShader<TFIn> fragmentShader,
         IRasterizer<TFIn> rasterizer,
-        IClipper<TFIn> clipper)
+        IClipper<TFIn> clipper, 
+        IPostProcessor? postProcessor = null)
     {
         _vertexShader = vertexShader;
         _fragmentShader = fragmentShader;
         _rasterizer = rasterizer;
         _clipper = clipper;
+        _postProcessor = postProcessor;
         _cachedRenderCallback = RenderTriangle;
         _cachedFragmentCallback = ProcessFragment;
     }
 
+    public IPostProcessor? PostProcessor { set => _postProcessor = value; }
     public bool BackfaceCullingEnabled { get; set; } = true;
+    public bool ClippingEnabled { get; set; } = true;
     public bool ScissorTestEnabled { get; set; }
+    public bool DepthTestEnabled { get; set; } = true;
 
     public void Render(IReadOnlyList<TVIn> vertices, IReadOnlyList<int> indices, IRenderTarget renderTarget)
     {
@@ -71,6 +76,13 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
             CData = v2Out
         };
 
+        if (!ClippingEnabled)
+        {
+            ToScreenSpace(ref triangle);
+            _rasterizer.Rasterize(in triangle, _cachedFragmentCallback);
+            return;
+        }
+        
         Span<Triangle<TFIn>> triangles = stackalloc Triangle<TFIn>[6];
 
         var count = _clipper.ClipTriangle(in triangle, ref triangles);
@@ -87,11 +99,15 @@ public sealed class GraphicsPipeline<TVIn, TFIn> where TVIn : unmanaged where TF
         if (ScissorTestEnabled && _viewport.IsOutOfViewport(in fragment.Position))
             return;
 
-        if (!_renderTarget.ZTest(fragment.Position.X, fragment.Position.Y, fragment.Position.Z))
+        if (DepthTestEnabled && !_renderTarget.DepthTestAndLock(fragment.Position.X, fragment.Position.Y, fragment.Position.Z))
             return;
 
-        _fragmentShader.ProcessFragment(in fragment.Position, in fragment.Data, out Color color);
-        _renderTarget.SetPixel(fragment.Position.X, fragment.Position.Y, fragment.Position.Z, in color);
+        _fragmentShader.ProcessFragment(in fragment.Position, in fragment.Data, out Vector4 color);
+        _postProcessor?.ProcessColor(ref color);
+        _renderTarget.SetPixel(fragment.Position.X, fragment.Position.Y, in color);
+        
+        if (DepthTestEnabled)
+            _renderTarget.UnlockPixel(fragment.Position.X, fragment.Position.Y);
     }
 
     private void ToScreenSpace(ref Triangle<TFIn> triangle)

@@ -2,7 +2,7 @@
 using System.Numerics;
 namespace GraphicsPipeline;
 
-public interface IFragmentShader<TIn> where TIn : struct
+public interface IFragmentShader<TIn> where TIn : unmanaged
 {
-    public void ProcessFragment(in Vector4 fragCoord, in TIn input, out Color color);
+    public void ProcessFragment(in Vector4 fragCoord, in TIn input, out Vector4 color);
 }
