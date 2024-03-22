@@ -6,6 +6,8 @@ using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.Phong;
 using GraphicsPipeline.Components.Shaders.PostProcess;
 using Utils;
+using Utils.Components;
+using Utils.Utils;
 namespace Benchmark.HdrBenchmarking;
 
 public sealed class HdrPhongRenderer2

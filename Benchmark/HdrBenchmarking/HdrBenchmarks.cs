@@ -3,6 +3,7 @@ using BenchmarkDotNet.Attributes;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Utils;
+using Utils.Components;
 using Utils.MeshLoader;
 using Utils.TextureLoader;
 namespace Benchmark.HdrBenchmarking;

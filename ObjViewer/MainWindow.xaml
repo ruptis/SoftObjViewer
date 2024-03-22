@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ObjViewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280" d:DataContext="{d:DesignInstance local:MainViewModel}">
+        Title="MainWindow" SizeToContent="WidthAndHeight" d:DataContext="{d:DesignInstance local:MainViewModel}">
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="Orange" />
@@ -13,15 +13,14 @@
             <Setter Property="FontSize" Value="16" />
         </Style>
     </Window.Resources>
-    <Grid>
+    <Grid x:Name="Root">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.5*" />
             <ColumnDefinition Width="0.5*" />
         </Grid.ColumnDefinitions>
-        <Image Grid.ColumnSpan="2" x:Name="Image"
-               HorizontalAlignment="Stretch"
-               VerticalAlignment="Stretch"
-               Stretch="UniformToFill" />
+        <Image Grid.ColumnSpan="2" x:Name="Image" 
+               Height="720" Width="1280"
+               Stretch="UniformToFill"/>
         <ComboBox Grid.Column="1" ItemsSource="{Binding RenderModes}"
                   SelectedItem="{Binding SelectedRenderMode}"
                   DisplayMemberPath="Name"

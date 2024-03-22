@@ -8,8 +8,10 @@ using GraphicsPipeline.Components.Shaders.Phong;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Utils;
+using Utils.Components;
 using Utils.MeshLoader;
 using Utils.TextureLoader;
+using Utils.Utils;
 using Color = System.Drawing.Color;
 namespace Benchmark.ClipperBenchmarking;
 

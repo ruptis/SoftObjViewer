@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
-namespace Utils;
+using Utils.Components;
+using Utils.Utils;
+namespace Utils.RenderTargets;
 
 public class TextureRenderTarget(Texture texture) : PresentableRenderTarget<Vector3>(texture.Width, texture.Height)
 {

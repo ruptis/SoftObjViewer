@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using ObjViewer.Rendering.Renderer;
+using Utils;
+using Utils.Components;
 namespace ObjViewer;
 
 public sealed class MainViewModel : INotifyPropertyChanged
@@ -30,6 +32,20 @@ public sealed class MainViewModel : INotifyPropertyChanged
     }
 
     public ObservableCollection<RenderMode> RenderModes { get; }
+    
+    private LightSource? _selectedLight;
+    public LightSource? SelectedLight
+    {
+        get => _selectedLight;
+        set
+        {
+            if (_selectedLight == value)
+                return;
+
+            _selectedLight = value;
+            OnPropertyChanged();
+        }
+    }
 
     private RenderMode _selectedRenderMode;
     public RenderMode SelectedRenderMode

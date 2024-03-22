@@ -1,4 +1,4 @@
-﻿namespace Utils;
+﻿namespace Utils.Components;
 
 public readonly record struct Model(
     Mesh Mesh,

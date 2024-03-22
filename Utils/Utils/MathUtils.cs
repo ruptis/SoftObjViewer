@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime.Intrinsics;
-namespace Utils;
+namespace Utils.Utils;
 
 public static class MathUtils
 {

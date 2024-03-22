@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Utils;
+using Utils.Components;
 namespace GraphicsPipeline.Components.Interpolation;
 
 public sealed class VertexHalfspaceInterpolator : IHalfspaceInterpolator<Vertex>

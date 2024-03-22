@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using GraphicsPipeline.Components.Interpolation;
-using Utils;
+using Utils.Utils;
 namespace GraphicsPipeline.Components.Rasterization;
 
 public sealed class ScanlineTriangleRasterizer<T, TInterpolator> : IRasterizer<T>

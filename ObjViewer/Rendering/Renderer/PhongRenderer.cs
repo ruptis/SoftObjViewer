@@ -4,6 +4,7 @@ using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.Simple;
 using Utils;
+using Utils.Components;
 namespace ObjViewer.Rendering.Renderer;
 
 public class PhongRenderer : SimpleRenderer<PhongFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexScanlineInterpolator>>

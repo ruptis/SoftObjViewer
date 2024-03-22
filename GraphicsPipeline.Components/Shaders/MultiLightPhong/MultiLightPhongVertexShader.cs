@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Utils;
+using Utils.Components;
 namespace GraphicsPipeline.Components.Shaders.MultiLightPhong;
 
 public sealed class MultiLightPhongVertexShader : IVertexShader<Vertex, MultiLightPhongShaderInput>

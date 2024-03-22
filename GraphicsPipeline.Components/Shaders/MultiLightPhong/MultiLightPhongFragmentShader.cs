@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using Utils;
+using Utils.Components;
+using Utils.Utils;
 namespace GraphicsPipeline.Components.Shaders.MultiLightPhong;
 
 public class MultiLightPhongFragmentShader : IFragmentShader<MultiLightPhongShaderInput>
@@ -7,7 +9,7 @@ public class MultiLightPhongFragmentShader : IFragmentShader<MultiLightPhongShad
     private static readonly Vector3 AmbientColor = new(0.2f);
     private const float Shininess = 64.0f;
     
-    public IReadOnlyList<Light> Lights { get; set; } = null!;
+    public IReadOnlyList<LightSource> Lights { get; set; } = null!;
     public Vector3 ViewPosition { get; set; }
 
     public Texture NormalMap { get; set; }
@@ -29,7 +31,7 @@ public class MultiLightPhongFragmentShader : IFragmentShader<MultiLightPhongShad
 
         for (var i = 0; i < Lights.Count; i++)
         {
-            Light light = Lights[i];
+            LightSource light = Lights[i];
             Vector3 toLight = light.Transform.Position - input.Position;
             var distance = toLight.Length();
 
@@ -38,7 +40,7 @@ public class MultiLightPhongFragmentShader : IFragmentShader<MultiLightPhongShad
             var attenuation = 1.0f / (1.0f + 0.07f * distance + 0.017f * distance * distance);
             attenuation *= attenuation;
 
-            Vector3 radiance = light.Color * light.Intensity * attenuation;
+            Vector3 radiance = light.Light.Color * light.Light.Intensity * attenuation;
 
             var lambertian = Vector3.Dot(lightDirection, normal);
             Vector3 diffuseComponent = Math.Max(lambertian, 0.0f) * diffuseSample * radiance;

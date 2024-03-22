@@ -1,12 +1,13 @@
 ﻿using System.Numerics;
-using Utils;
+using Utils.Components;
+using Utils.Utils;
 namespace GraphicsPipeline.Components.Shaders.Pbr;
 
 public sealed class PbrFragmentShader : IFragmentShader<PbrShaderInput>
 {
     private static readonly Vector3 SpecularCoefficient = new(0.04f);
 
-    public IReadOnlyList<Light> Lights { get; set; } = null!;
+    public IReadOnlyList<LightSource> Lights { get; set; } = null!;
     public Vector3 ViewPosition { get; set; }
 
     public Texture AlbedoTexture { get; set; }
@@ -38,7 +39,7 @@ public sealed class PbrFragmentShader : IFragmentShader<PbrShaderInput>
 
     private static Vector3 ShadeSurface(
         in Vector3 position, in Vector3 viewDirection, in Vector3 normal,
-        IReadOnlyList<Light> lights,
+        IReadOnlyList<LightSource> lights,
         in Vector3 albedo,
         float roughness, float metallic, float ambientOcclusion)
     {
@@ -72,11 +73,11 @@ public sealed class PbrFragmentShader : IFragmentShader<PbrShaderInput>
         return color;
     }
 
-    private static void GetDirectionAndRadiance(Light light, in Vector3 position, out Vector3 lightDirection, out Vector3 radiance)
+    private static void GetDirectionAndRadiance(LightSource light, in Vector3 position, out Vector3 lightDirection, out Vector3 radiance)
     {
         var attenuation = 1.0f;
 
-        switch (light.Type)
+        switch (light.Light.Type)
         {
             case LightType.Directional:
                 lightDirection = light.Transform.Forward;
@@ -86,7 +87,7 @@ public sealed class PbrFragmentShader : IFragmentShader<PbrShaderInput>
                 var distanceSquared = toLight.LengthSquared();
                 lightDirection = toLight * MathF.ReciprocalSqrtEstimate(distanceSquared);
                 attenuation = MathUtils.Square(
-                    MathUtils.Clamp01(1.0f - MathUtils.Square(distanceSquared * MathUtils.Square(light.InvRange))));
+                    MathUtils.Clamp01(1.0f - MathUtils.Square(distanceSquared * MathUtils.Square(light.Light.InvRange))));
                 break;
             case LightType.Spot:
                 Vector3 toSpot = light.Transform.Position - position;
@@ -94,15 +95,15 @@ public sealed class PbrFragmentShader : IFragmentShader<PbrShaderInput>
                 lightDirection = toSpot * MathF.ReciprocalSqrtEstimate(distanceSquaredSpot);
                 var spotFactor = Vector3.Dot(-lightDirection, light.Transform.Forward);
                 const float deg2Rad = MathF.PI / 180.0f;
-                var spotAngleCos = MathF.Cos(light.SpotAngle * deg2Rad);
+                var spotAngleCos = MathF.Cos(light.Light.SpotAngle * deg2Rad);
                 attenuation = MathUtils.Square(
-                    MathUtils.Clamp01(1.0f - MathUtils.Square(distanceSquaredSpot * MathUtils.Square(light.InvRange))) *
+                    MathUtils.Clamp01(1.0f - MathUtils.Square(distanceSquaredSpot * MathUtils.Square(light.Light.InvRange))) *
                     MathUtils.Clamp01((spotFactor - spotAngleCos) / (1.0f - spotAngleCos)));
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
 
-        radiance = light.Color * light.Intensity * attenuation;
+        radiance = light.Light.Color * light.Light.Intensity * attenuation;
     }
 }

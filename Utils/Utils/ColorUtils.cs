@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 using System.Numerics;
-namespace Utils;
+namespace Utils.Utils;
 
 public static class ColorUtils
 {

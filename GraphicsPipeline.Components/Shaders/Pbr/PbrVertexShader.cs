@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
-using GraphicsPipeline.Components.Shaders.MultiLightPhong;
-using Utils;
+using Utils.Components;
 namespace GraphicsPipeline.Components.Shaders.Pbr;
 
 public sealed class PbrVertexShader : IVertexShader<Vertex, PbrShaderInput>

@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Utils;
+using Utils.Utils;
 namespace GraphicsPipeline.Components.Shaders.PostProcess;
 
 public sealed class ToneMappingPostProcessor : IPostProcessor

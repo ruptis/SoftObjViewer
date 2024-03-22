@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Utils;
+using Utils.RenderTargets;
 namespace Benchmark;
 
 public sealed class ImageRenderTarget(Image<Rgba32> image) : PresentableRenderTarget<uint>(image.Width, image.Height)

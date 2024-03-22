@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Utils.Components;
 namespace Utils.MeshLoader;
 
 public class ObjParser : IMeshLoader

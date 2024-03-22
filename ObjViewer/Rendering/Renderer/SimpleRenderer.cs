@@ -3,6 +3,7 @@ using GraphicsPipeline.Components.Clipping;
 using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Shaders.Simple;
 using Utils;
+using Utils.Components;
 namespace ObjViewer.Rendering.Renderer;
 
 public class SimpleRenderer<TF, TR> : SceneRenderer<Vertex, SimpleVertexShader, TF, TR, Clipper<Vertex, VertexLinearInterpolator>>

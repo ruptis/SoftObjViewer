@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-namespace Utils;
+namespace Utils.Components;
 
 public readonly struct Texture(int width, int height, Vector3[] data)
 {

@@ -1,4 +1,4 @@
-﻿namespace Utils;
+﻿namespace Utils.Components;
 
 public readonly record struct Mesh(IReadOnlyList<Vertex> Vertices, IReadOnlyList<int> Indices)
 {

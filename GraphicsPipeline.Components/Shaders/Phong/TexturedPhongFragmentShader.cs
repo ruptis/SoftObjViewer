@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Utils;
+using Utils.Components;
 namespace GraphicsPipeline.Components.Shaders.Phong;
 
 public sealed class TexturedPhongFragmentShader : IFragmentShader<PhongShaderInput>

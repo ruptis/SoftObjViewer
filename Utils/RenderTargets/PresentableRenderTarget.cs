@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 using GraphicsPipeline;
-namespace Utils;
+namespace Utils.RenderTargets;
 
 public abstract class PresentableRenderTarget<T>(int width, int height) : IRenderTarget
 {

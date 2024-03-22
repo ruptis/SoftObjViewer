@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Utils;
+using Utils.Components;
 namespace GraphicsPipeline.Components.Shaders.Simple;
 
 public sealed class PhongFragmentShader : IFragmentShader<Vertex>

@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Utils.Components;
 namespace Utils.TextureLoader;
 
 public class PngTextureLoader : ITextureLoader

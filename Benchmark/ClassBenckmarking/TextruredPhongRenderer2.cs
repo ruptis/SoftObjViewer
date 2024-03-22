@@ -5,6 +5,7 @@ using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.Phong;
 using Utils;
+using Utils.Components;
 namespace Benchmark.ClassBenckmarking;
 
 public abstract class ModelRenderer2<TFIn, TV, TF, TR, TC>

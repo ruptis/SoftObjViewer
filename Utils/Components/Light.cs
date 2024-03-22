@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-namespace Utils;
+namespace Utils.Components;
 
 public enum LightType
 {
@@ -7,15 +7,13 @@ public enum LightType
     Point,
     Spot
 }
-public class Light(
-    Transform transform,
+public struct Light(
     Vector3 color,
     LightType type,
     float intensity,
     float range,
     float spotAngle)
 {
-    public Transform Transform { get; init; } = transform;
     public Vector3 Color { get; set; } = color;
     public LightType Type { get; set; } = type;
     public float Intensity { get; set; } = intensity;
@@ -30,12 +28,4 @@ public class Light(
     }
     public float InvRange { get; private set; } = 1.0f / range;
     public float SpotAngle { get; set; } = spotAngle;
-
-    public static Light Default =>
-        new(new Transform(Vector3.Zero, Quaternion.Identity, Vector3.One),
-            Vector3.One,
-            LightType.Directional,
-            1,
-            10,
-            45);
 }

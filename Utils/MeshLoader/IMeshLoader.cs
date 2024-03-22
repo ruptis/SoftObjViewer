@@ -1,4 +1,5 @@
-﻿namespace Utils.MeshLoader;
+﻿using Utils.Components;
+namespace Utils.MeshLoader;
 
 public interface IMeshLoader
 {

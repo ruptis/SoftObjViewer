@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
-namespace Utils;
+using Utils.Utils;
+namespace Utils.Components;
 
 public class Camera(float fieldOfView, float nearPlane, float farPlane, float aspectRatio)
 {
@@ -15,4 +16,19 @@ public class Camera(float fieldOfView, float nearPlane, float farPlane, float as
 
     public Matrix4x4 ViewMatrix => Matrix4x4.CreateLookTo(Transform.Position, -Transform.Forward, Transform.Up);
     public Matrix4x4 ProjectionMatrix => Matrix4x4.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
+
+    public Ray ScreenPointToRay(Vector2 screenPoint, Vector2 viewport)
+    {
+        var rayEndNdc = new Vector4(screenPoint.X / viewport.X * 2 - 1, 1 - screenPoint.Y / viewport.Y * 2, 1, 1);
+
+        Matrix4x4.Invert(ViewMatrix, out Matrix4x4 invView);
+        Matrix4x4.Invert(ProjectionMatrix, out Matrix4x4 invProj);
+
+        Vector4 rayEndClip = Vector4.Transform(rayEndNdc, invProj);
+
+        Vector4 rayEnd = Vector4.Transform(rayEndClip, invView);
+        rayEnd /= rayEnd.W;
+
+        return new Ray(Transform.Position, Vector3.Normalize(rayEnd.AsVector3() - Transform.Position));
+    }
 }

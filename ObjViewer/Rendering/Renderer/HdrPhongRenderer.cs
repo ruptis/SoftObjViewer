@@ -5,6 +5,7 @@ using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.MultiLightPhong;
 using GraphicsPipeline.Components.Shaders.PostProcess;
 using Utils;
+using Utils.Components;
 namespace ObjViewer.Rendering.Renderer;
 
 public class HdrPhongRenderer() : SceneRenderer<

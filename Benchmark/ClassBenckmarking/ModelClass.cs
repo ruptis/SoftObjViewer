@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Utils;
+using Utils.Components;
 namespace Benchmark.ClassBenckmarking;
 
 public sealed class TextureClass(int width, int height, Vector3[] data)

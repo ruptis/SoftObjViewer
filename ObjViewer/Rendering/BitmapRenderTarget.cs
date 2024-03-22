@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Utils;
+using Utils.RenderTargets;
 namespace ObjViewer.Rendering;
 
 public sealed class BitmapRenderTarget(

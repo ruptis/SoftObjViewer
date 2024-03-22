@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Utils;
+using Utils.Utils;
 namespace GraphicsPipeline.Components.Shaders.Pbr;
 
 public static class BRDF
@@ -57,6 +57,14 @@ public static class BRDF
 
     public static float GShlickSmithHable(float alpha2, float lDotH) =>
         MathF.ReciprocalEstimate(float.Lerp(lDotH * lDotH, 1.0f, alpha2 * 0.25f));
+
+    public static float GSmithSchlickGgx(float alpha2, float nDotV, float nDotL)
+    {
+        var alpha = MathF.Sqrt(alpha2);
+        var ggxV = nDotL * (nDotV * (1 - alpha) + alpha);
+        var ggxL = nDotV * (nDotL * (1 - alpha) + alpha);
+        return 0.5f * MathF.ReciprocalEstimate(ggxV + ggxL);
+    }
 
     public static float SpecularDGgx(float alpha2, float nDotH)
     {

@@ -8,6 +8,7 @@ using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Shaders;
 using GraphicsPipeline.Components.Shaders.Simple;
 using Utils;
+using Utils.Components;
 using Utils.MeshLoader;
 using Utils.TextureLoader;
 namespace Benchmark.ClipperBenchmarking;

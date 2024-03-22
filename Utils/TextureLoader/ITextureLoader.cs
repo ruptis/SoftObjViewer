@@ -1,4 +1,5 @@
-﻿namespace Utils.TextureLoader;
+﻿using Utils.Components;
+namespace Utils.TextureLoader;
 
 public interface ITextureLoader
 {
