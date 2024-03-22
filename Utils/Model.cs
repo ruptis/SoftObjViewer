@@ -4,7 +4,7 @@ public readonly record struct Model(
     Mesh Mesh,
     Transform Transform)
 {
-    private readonly Texture[] _textures = new Texture[4];
+    private readonly Texture[] _textures = [Texture.Empty, Texture.Empty, Texture.Empty, Texture.Empty];
 
     public Model() : this(new Mesh(), Transform.Identity) {}
     public Model(Mesh mesh) : this(mesh, Transform.Identity) {}

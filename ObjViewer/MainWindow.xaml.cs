@@ -47,32 +47,19 @@ public partial class MainWindow
         Image.Source = _renderTarget.Bitmap;
 
         _camera = new Camera(_renderTarget.Width / (float)_renderTarget.Height);
-        _camera.Transform.Position = new Vector3(5, 3, 7);
+        _camera.Transform.Position = new Vector3(0, 5, 8);
         _camera.Transform.LookAt(Vector3.Zero, Vector3.UnitY);
 
-        /*_lights.Add(new Light(new Transform
-            {
-                Position = new Vector3(-3, 8, 8)
-            },
-            ColorUtils.Yellow.AsVector3(),
-            LightType.Directional,
-            5, 12, 45));
-
-        _lights.Add(new Light(new Transform
-            {
-                Position = new Vector3(3, 8, 8)
-            },
-            ColorUtils.Red.AsVector3(),
-            LightType.Directional,
-            5, 12, 45));*/
-
-        _lights.Add(new Light(new Transform
+        var directionalLight = new Light(new Transform
             {
                 Position = new Vector3(0, 8, 8)
             },
             ColorUtils.White.AsVector3(),
             LightType.Directional,
-            5, 12, 45));
+            1, 20, 45);
+        directionalLight.Transform.LookAt(Vector3.Zero, Vector3.UnitY);
+
+        _lights.Add(directionalLight);
 
         _scene = new Scene
         {
@@ -114,9 +101,9 @@ public partial class MainWindow
             AlbedoTexture = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_basecolor.png"),
             NormalTexture = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_normal.png", true),
             RmaTexture = Texture.CreateRmaTexture(
-                    await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_roughness.png"),
-                    await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_metalic.png"),
-                    await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_ao.png"))
+                await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_roughness.png"),
+                await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_metalic.png"),
+                await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_ao.png"))
         };
     }
 
@@ -124,13 +111,6 @@ public partial class MainWindow
     {
         var frameTime = _frameTimer.Elapsed.TotalMilliseconds;
         _frameTimer.Restart();
-
-        /*for (var i = 0; i < _lights.Count; i++)
-        {
-            _lights[i].Transform.RotateAround(Vector3.Zero, Vector3.UnitY, 0.08f);
-            _lights[i].Transform.RotateAround(Vector3.Zero, Vector3.UnitX, 0.08f);
-            _lights[i].Transform.LookAt(Vector3.Zero, Vector3.UnitY);
-        }*/
 
         _drawTimer.Restart();
         Renderer.RenderScene(_scene, _renderTarget);

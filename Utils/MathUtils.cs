@@ -23,6 +23,16 @@ public static class MathUtils
         MathF.Pow(value.Z, power),
         MathF.Pow(value.W, power)
     );
+    
+    public static float Square(float x) => x * x;
+    public static float Pow5(float x) => x * x * x * x * x;
+    
+    public static float RcpFast(float x) => BitConverter.Int32BitsToSingle(0x7EF311C2 - BitConverter.SingleToInt32Bits(x));
+    public static float SqrtFast(float x)
+    {
+        var i = BitConverter.SingleToInt32Bits(x);
+        return BitConverter.Int32BitsToSingle(0x1FBD1DF5 + (i >> 1));
+    }
 
     public static Matrix4x4 TbnSpace(in Vector3 tangent, in Vector3 bitangent, in Vector3 normal) => new(
         tangent.X, tangent.Y, tangent.Z, 0.0f,

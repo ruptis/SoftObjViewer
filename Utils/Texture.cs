@@ -3,6 +3,7 @@ namespace Utils;
 
 public readonly struct Texture(int width, int height, Vector3[] data)
 {
+    public static Texture Empty { get; } = new(1, 1, [Vector3.Zero]);
     public static Texture Checkerboard256 { get; } = new(256, 256, CreateCheckerboard(256));
     public static Texture Checkerboard512 { get; } = new(512, 512, CreateCheckerboard(512));
 
@@ -10,8 +11,6 @@ public readonly struct Texture(int width, int height, Vector3[] data)
     public int Height => height;
     public Vector3[] Data => data;
 
-    public Texture(int width, int height) : this(width, height, new Vector3[width * height]) { }
-    
     public ref Vector3 SampleColor(in Vector2 uv)
     {
         var index = GetSampleIndex(uv);

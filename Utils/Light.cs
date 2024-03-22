@@ -19,7 +19,16 @@ public class Light(
     public Vector3 Color { get; set; } = color;
     public LightType Type { get; set; } = type;
     public float Intensity { get; set; } = intensity;
-    public float Range { get; set; } = range;
+    public float Range
+    {
+        get => range;
+        set
+        {
+            range = value;
+            InvRange = 1.0f / range;
+        }
+    }
+    public float InvRange { get; private set; } = 1.0f / range;
     public float SpotAngle { get; set; } = spotAngle;
 
     public static Light Default =>

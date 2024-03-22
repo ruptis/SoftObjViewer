@@ -21,7 +21,7 @@ public class MultiLightPhongFragmentShader : IFragmentShader<MultiLightPhongShad
         Matrix4x4 tbn = MathUtils.TbnSpace(input.Tangent, input.Bitangent, input.Normal);
         
         Vector3 normal = Vector3.TransformNormal(NormalMap.SampleNormal(input.TextureCoordinates), tbn);
-        Vector3 diffuseSample = DiffuseMap.SampleColor(input.TextureCoordinates);
+        Vector3 diffuseSample = DiffuseMap.SampleColor(input.TextureCoordinates).SrgbToLinear();
         Vector3 specularSample = SpecularMap.SampleColor(input.TextureCoordinates);
         
         Vector3 ambientComponent = AmbientColor * diffuseSample;
@@ -32,11 +32,6 @@ public class MultiLightPhongFragmentShader : IFragmentShader<MultiLightPhongShad
             Light light = Lights[i];
             Vector3 toLight = light.Transform.Position - input.Position;
             var distance = toLight.Length();
-
-            /*if (distance > light.Range)
-            {
-                continue;
-            }*/
 
             Vector3 lightDirection = toLight / distance;
 
