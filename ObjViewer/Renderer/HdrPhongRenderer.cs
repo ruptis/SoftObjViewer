@@ -4,9 +4,8 @@ using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.MultiLightPhong;
 using GraphicsPipeline.Components.Shaders.PostProcess;
-using Utils;
 using Utils.Components;
-namespace ObjViewer.Rendering.Renderer;
+namespace ObjViewer.Renderer;
 
 public class HdrPhongRenderer() : SceneRenderer<
     MultiLightPhongShaderInput,

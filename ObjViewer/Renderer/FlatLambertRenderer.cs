@@ -1,13 +1,10 @@
 ﻿using System.Numerics;
 using GraphicsPipeline;
-using GraphicsPipeline.Components;
 using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
-using GraphicsPipeline.Components.Shaders;
 using GraphicsPipeline.Components.Shaders.Simple;
-using Utils;
 using Utils.Components;
-namespace ObjViewer.Rendering.Renderer;
+namespace ObjViewer.Renderer;
 
 public sealed class FlatLambertRenderer : SimpleRenderer<LambertFragmentShader, ScanlineTriangleRasterizer<Vertex, VertexScanlineInterpolator>>
 {

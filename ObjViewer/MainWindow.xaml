@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         xmlns:local="clr-namespace:ObjViewer"
         mc:Ignorable="d"
         Title="MainWindow" SizeToContent="WidthAndHeight" d:DataContext="{d:DesignInstance local:MainViewModel}">
@@ -12,22 +13,51 @@
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontSize" Value="16" />
         </Style>
+        <Style TargetType="colorpicker:StandardColorPicker">
+            <Setter Property="Width" Value="200" />
+            <Setter Property="Height" Value="200" />
+            <Setter Property="Background" Value="WhiteSmoke" />
+        </Style>
     </Window.Resources>
-    <Grid x:Name="Root">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.5*" />
             <ColumnDefinition Width="0.5*" />
         </Grid.ColumnDefinitions>
-        <Image Grid.ColumnSpan="2" x:Name="Image" 
+        <Image Grid.ColumnSpan="2" x:Name="Image"
                Height="720" Width="1280"
-               Stretch="UniformToFill"/>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding RenderModes}"
+               Stretch="UniformToFill" />
+        <ComboBox Grid.Column="1"
+                  ItemsSource="{Binding RenderModes}"
                   SelectedItem="{Binding SelectedRenderMode}"
                   DisplayMemberPath="Name"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Top"
                   Margin="10"
                   Width="200" />
+        <StackPanel Grid.Column="1"
+                    Visibility="{Binding LightControlsVisibility}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="10"
+                    Width="250"
+                    Background="WhiteSmoke">
+            <DockPanel Margin="5" LastChildFill="False">
+                <TextBlock Text="Type: " Margin="0,0,5,0" DockPanel.Dock="Left"/>
+                <ComboBox ItemsSource="{Binding LightTypes}"
+                          SelectedItem="{Binding LightType}" DockPanel.Dock="Right"/>
+            </DockPanel>
+            <Separator/>
+            <DockPanel Margin="5">
+                <TextBlock Text="Intensity: " Margin="0,0,5,0" DockPanel.Dock="Left"/>
+                <Slider Value="{Binding LightIntensity, Mode=TwoWay}" Minimum="0" Maximum="5" DockPanel.Dock="Right"/>
+            </DockPanel>
+            <Separator/>
+            <DockPanel Margin="5" LastChildFill="False">
+                <TextBlock Text="Color: " Margin="0,0,5,0" DockPanel.Dock="Left"/>
+                <colorpicker:SquarePicker SelectedColor="{Binding LightColor, Mode=TwoWay}" DockPanel.Dock="Right"/>
+            </DockPanel>
+        </StackPanel>
         <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="FPS: " Margin="0,0,5,0" />

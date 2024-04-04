@@ -5,11 +5,8 @@ using System.Numerics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using ObjViewer.Rendering;
-using ObjViewer.Rendering.Renderer;
+using ObjViewer.Renderer;
 using Utils.Components;
-using Utils.MeshLoader;
-using Utils.TextureLoader;
 using Utils.Utils;
 using Transform = Utils.Components.Transform;
 namespace ObjViewer;
@@ -19,11 +16,10 @@ namespace ObjViewer;
 /// </summary>
 public partial class MainWindow
 {
+    private readonly Task<Model> _modelTask;
     private readonly MainViewModel _viewModel = new();
 
     private ISceneRenderer Renderer => _viewModel.SelectedRenderMode.Renderer;
-    private readonly IMeshLoader _meshLoader = new ObjParser();
-    private readonly ITextureLoader _textureLoader = new PngTextureLoader();
 
     private Scene _scene;
 
@@ -42,8 +38,9 @@ public partial class MainWindow
 
     private readonly Action _presentAction;
 
-    public MainWindow()
+    public MainWindow(Task<Model> modelTask)
     {
+        _modelTask = modelTask;
         InitializeComponent();
 
         _renderTarget = new BitmapRenderTarget((int)Image.Width, (int)Image.Height);
@@ -96,28 +93,8 @@ public partial class MainWindow
         });
     }
 
-    private async void OnLoaded(object sender, RoutedEventArgs e)
-    {
-        _scene.Model = new Model
-        {
-            Mesh = await _meshLoader.LoadMeshAsync("ModelSamples/chest2.obj"),
-            Transform = new Transform
-            {
-                Position = new Vector3(0f, -2f, 0f),
-                Rotation = Quaternion.CreateFromYawPitchRoll(0, -MathF.PI / 2, 0),
-                Scale = new Vector3(2f)
-            },
-            /*DiffuseMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/chest_diffuse2.png"),
-            NormalMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_normal.png", true),
-            SpecularMap = await _textureLoader.LoadTextureAsync("ModelSamples/textures/chest_specular3.png")*/
-            AlbedoTexture = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_basecolor.png"),
-            NormalTexture = await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_normal.png", true),
-            RmaTexture = Texture.CreateRmaTexture(
-                await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_roughness.png"),
-                await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_metalic.png"),
-                await _textureLoader.LoadTextureAsync("ModelSamples/textures/KittyChest_low_ao.png"))
-        };
-    }
+    private async void OnLoaded(object sender, RoutedEventArgs e) => 
+        _scene.Model = await _modelTask;
 
     private void OnRendering()
     {
@@ -129,7 +106,6 @@ public partial class MainWindow
         _drawTimer.Restart();
         Renderer.RenderScene(_scene, _renderTarget);
         Dispatcher.Invoke(_presentAction);
-        Dispatcher.Invoke(() => Title = $"RTSize: {_renderTarget.Width}x{_renderTarget.Height} | WPFSize: {Width}x{Height} | ImageSize: {Image.ActualWidth}x{Image.ActualHeight}");
         _drawTimer.Stop();
 
         UpdateInfo(_drawTimer.Elapsed.TotalMilliseconds, frameTime);
@@ -152,7 +128,7 @@ public partial class MainWindow
     protected override void OnMouseDown(MouseButtonEventArgs e)
     {
         base.OnMouseDown(e);
-        if (e.ChangedButton != MouseButton.Left)
+        if (e.ChangedButton != MouseButton.Left || !Equals(e.Source, Image))
             return;
 
         Vector2 mousePosition = ToVector(e.GetPosition(Image));
@@ -160,16 +136,19 @@ public partial class MainWindow
 
         Ray ray = _camera.ScreenPointToRay(mousePosition, new Vector2(_renderTarget.Width, _renderTarget.Height));
 
+        LightSource? selectedLight = null;
+
         for (var i = 0; i < _lights.Count; i++)
         {
             LightSource light = _lights[i];
             if (light.BoundingBox.Intersects(ray))
             {
-                _viewModel.SelectedLight = light;
-                return;
+                selectedLight = light;
+                break;
             }
         }
-
+        
+        _viewModel.SelectedLight = selectedLight;
         _isDragging = true;
     }
 
@@ -177,16 +156,10 @@ public partial class MainWindow
     protected override void OnMouseUp(MouseButtonEventArgs e)
     {
         base.OnMouseUp(e);
-        if (e.ChangedButton != MouseButton.Left)
+        if (e.ChangedButton != MouseButton.Left || !Equals(e.Source, Image))
             return;
 
         _previousMousePosition = default;
-
-        if (_viewModel.SelectedLight != null)
-        {
-            _viewModel.SelectedLight = null;
-            return;
-        }
 
         _isDragging = false;
     }
@@ -194,6 +167,8 @@ public partial class MainWindow
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
+        if (!Equals(e.Source, Image))
+            return;
 
         Vector2 currentMousePosition = ToVector(e.GetPosition(Image));
         Vector2 delta = currentMousePosition - _previousMousePosition;
@@ -201,7 +176,7 @@ public partial class MainWindow
         
         LightSource? selectedLight = _viewModel.SelectedLight;
 
-        if (selectedLight != null)
+        if (selectedLight != null && _isDragging)
         {
             Ray ray = _camera.ScreenPointToRay(currentMousePosition, new Vector2(_renderTarget.Width, _renderTarget.Height));
             var distance = Vector3.Distance(selectedLight.Transform.Position, _camera.Transform.Position);

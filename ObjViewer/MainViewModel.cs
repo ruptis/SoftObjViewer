@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-using ObjViewer.Rendering.Renderer;
-using Utils;
+using System.Windows;
+using System.Windows.Media;
+using ObjViewer.Renderer;
 using Utils.Components;
+using Utils.Utils;
 namespace ObjViewer;
 
 public sealed class MainViewModel : INotifyPropertyChanged
@@ -33,6 +36,73 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public ObservableCollection<RenderMode> RenderModes { get; }
     
+    public ObservableCollection<LightType> LightTypes { get; } = new(Enum.GetValues<LightType>());
+    
+    public Visibility LightControlsVisibility => _selectedLight is not null ? Visibility.Visible : Visibility.Collapsed;
+    public Color LightColor
+    {
+        get => ToColor(_selectedLight?.Light.Color ?? ColorUtils.White.AsVector3());
+        set
+        {
+            if (_selectedLight is null)
+                return;
+
+            _selectedLight.Light.Color = ToVector3(value);
+            OnPropertyChanged();
+        }
+    }
+    public LightType LightType
+    {
+        get => _selectedLight?.Light.Type ?? LightType.Directional;
+        set
+        {
+            if (_selectedLight is null)
+                return;
+
+            _selectedLight.Light.Type = value;
+            OnPropertyChanged();
+        }
+    }
+    public float LightIntensity
+    {
+        get => _selectedLight?.Light.Intensity ?? 1;
+        set
+        {
+            if (_selectedLight is null)
+                return;
+
+            _selectedLight.Light.Intensity = value;
+            OnPropertyChanged();
+        }
+    }
+    public float LightRange
+    {
+        get => _selectedLight?.Light.Range ?? 20;
+        set
+        {
+            if (_selectedLight is null)
+                return;
+
+            _selectedLight.Light.Range = value;
+            OnPropertyChanged();
+        }
+    }
+    public float LightSpotAngle
+    {
+        get => _selectedLight?.Light.SpotAngle ?? 45;
+        set
+        {
+            if (_selectedLight is null)
+                return;
+
+            _selectedLight.Light.SpotAngle = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    private static Color ToColor(in Vector3 vector) => Color.FromRgb((byte)(vector.X * byte.MaxValue), (byte)(vector.Y * byte.MaxValue), (byte)(vector.Z * byte.MaxValue));
+    private static Vector3 ToVector3(in Color color) => new(color.R / (float)byte.MaxValue, color.G / (float)byte.MaxValue, color.B / (float)byte.MaxValue);
+    
     private LightSource? _selectedLight;
     public LightSource? SelectedLight
     {
@@ -44,6 +114,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
             _selectedLight = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(LightControlsVisibility));
+            OnPropertyChanged(nameof(LightColor));
+            OnPropertyChanged(nameof(LightType));
+            OnPropertyChanged(nameof(LightIntensity));
+            OnPropertyChanged(nameof(LightRange));
+            OnPropertyChanged(nameof(LightSpotAngle));
         }
     }
 

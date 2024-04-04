@@ -6,10 +6,9 @@ using GraphicsPipeline.Components.Clipping;
 using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.Debug;
-using Utils;
 using Utils.Components;
 using Utils.Utils;
-namespace ObjViewer.Rendering.Renderer;
+namespace ObjViewer.Renderer;
 
 public abstract class SceneRenderer<TFIn, TV, TF, TR, TC> : ISceneRenderer
     where TFIn : unmanaged

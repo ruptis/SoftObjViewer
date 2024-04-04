@@ -1,8 +1,7 @@
 ﻿using System.Numerics;
 using GraphicsPipeline;
-using Utils;
 using Utils.Components;
-namespace ObjViewer.Rendering.Renderer;
+namespace ObjViewer.Renderer;
 
 public interface ISceneRenderer
 {

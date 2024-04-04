@@ -4,9 +4,8 @@ using GraphicsPipeline.Components.Interpolation;
 using GraphicsPipeline.Components.Rasterization;
 using GraphicsPipeline.Components.Shaders.Pbr;
 using GraphicsPipeline.Components.Shaders.PostProcess;
-using Utils;
 using Utils.Components;
-namespace ObjViewer.Rendering.Renderer;
+namespace ObjViewer.Renderer;
 
 public sealed class PbrRenderer() : SceneRenderer<
     PbrShaderInput,

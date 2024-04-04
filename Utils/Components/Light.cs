@@ -7,7 +7,7 @@ public enum LightType
     Point,
     Spot
 }
-public struct Light(
+public class Light(
     Vector3 color,
     LightType type,
     float intensity,

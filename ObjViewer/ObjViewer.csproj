@@ -9,9 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\GraphicsPipeline.Components\GraphicsPipeline.Components.csproj"/>
+        <ProjectReference Include="..\GraphicsPipeline.Components\GraphicsPipeline.Components.csproj" />
         <ProjectReference Include="..\GraphicsPipeline\GraphicsPipeline.csproj"/>
         <ProjectReference Include="..\Utils\Utils.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
     </ItemGroup>
 
 </Project>

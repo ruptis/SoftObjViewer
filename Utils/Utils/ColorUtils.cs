@@ -4,12 +4,25 @@ namespace Utils.Utils;
 
 public static class ColorUtils
 {
-    public static Vector4 ToVector(this Color color) => 
+    public static Vector4 ToVector(this Color color) =>
         new(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
-    
+
+    public static Color ToColor(this in Vector4 color) =>
+        Color.FromArgb(
+            (int)(color.W * 255),
+            (int)(color.X * 255),
+            (int)(color.Y * 255),
+            (int)(color.Z * 255));
+    public static Color ToColor(this in Vector3 color) =>
+        Color.FromArgb(
+            255,
+            (int)(color.X * 255),
+            (int)(color.Y * 255),
+            (int)(color.Z * 255));
+
     public static Vector3 SrgbToLinear(this in Vector3 color) => color.Pow(2.2f);
     public static Vector4 SrgbToLinear(this in Vector4 color) => color.Pow(2.2f);
-    
+
     public static Vector3 LinearToSrgb(this in Vector3 color) => color.Pow(1.0f / 2.2f);
     public static Vector4 LinearToSrgb(this in Vector4 color) => color.Pow(1.0f / 2.2f);
 
